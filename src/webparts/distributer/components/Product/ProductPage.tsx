@@ -48,6 +48,7 @@ export default class ProductPage extends React.Component<any, any> {
       Code,
       IdCode,
       Inventory,
+      Price,
     } = item;
 
     let modifiedThermalClass = thermalclass;
@@ -126,7 +127,18 @@ export default class ProductPage extends React.Component<any, any> {
           </p>
 
           <p className={styles.productDetailsP}>
-            موجودی: <span className={styles.productDetailsSPAN}>{Inventory}</span>
+            قیمت: <span className={styles.productDetailsSPAN}>{Price}</span>
+          </p>
+
+          <p className={styles.productDetailsP}>
+            تعداد رشته:
+            <span className={styles.productDetailsSPAN}>
+              {Inventory ? (
+                Inventory
+              ) : (
+                <small className={styles.productDetailsSMALL}>ناموجود</small>
+              )}
+            </span>
           </p>
 
           <div style={{ display: "flex", flexDirection: "row-reverse" }}>

@@ -102,7 +102,7 @@ export default class ProductCard extends React.Component<Product, any> {
   };
 
   render() {
-    const { Title, Code, image, Inventory } = this.props;
+    const { Title, Code, image, Inventory, Price } = this.props;
     const { showCounter, itemId, showMessage } = this.state;
 
     return (
@@ -124,8 +124,13 @@ export default class ProductCard extends React.Component<Product, any> {
             rel="noopener noreferrer"
           >
             <p className={styles.titleDescription}>{Title}</p>
+
+            <div className={styles.priceDiv}>
+              <p className={styles.codeDescription}>موجودی: {Inventory}</p>
+              <p className={styles.codeDescription}>قیمت: {Price}</p>
+            </div>
+
             <p className={styles.codeDescription}>کدکالا: {Code}</p>
-            <p className={styles.codeDescription}>موجودی: {Inventory}</p>
           </a>
         </div>
 

@@ -1,30 +1,22 @@
-import * as React from 'react';
-import * as ReactDom from 'react-dom';
-import { Version } from '@microsoft/sp-core-library';
+import * as React from "react";
+import * as ReactDom from "react-dom";
+import { Version } from "@microsoft/sp-core-library";
 import {
   BaseClientSideWebPart,
   IPropertyPaneConfiguration,
-  PropertyPaneTextField
-} from '@microsoft/sp-webpart-base';
+  PropertyPaneTextField,
+} from "@microsoft/sp-webpart-base";
 
-import * as strings from 'DistributerWebPartStrings';
-import Distributer from './components/Distributer';
-import { IDistributerProps } from './components/IDistributerProps';
+import * as strings from "DistributerWebPartStrings";
+import AppRouter from "./components/Router/AppRouter";
 
 export interface IDistributerWebPartProps {
   description: string;
 }
 
 export default class DistributerWebPart extends BaseClientSideWebPart<IDistributerWebPartProps> {
-
   public render(): void {
-    const element: React.ReactElement<IDistributerProps > = React.createElement(
-      Distributer,
-      {
-        description: this.properties.description
-      }
-    );
-
+    const element = React.createElement(AppRouter, {});
     ReactDom.render(element, this.domElement);
   }
 
@@ -33,7 +25,7 @@ export default class DistributerWebPart extends BaseClientSideWebPart<IDistribut
   }
 
   protected get dataVersion(): Version {
-    return Version.parse('1.0');
+    return Version.parse("1.0");
   }
 
   protected getPropertyPaneConfiguration(): IPropertyPaneConfiguration {
@@ -41,20 +33,20 @@ export default class DistributerWebPart extends BaseClientSideWebPart<IDistribut
       pages: [
         {
           header: {
-            description: strings.PropertyPaneDescription
+            description: strings.PropertyPaneDescription,
           },
           groups: [
             {
               groupName: strings.BasicGroupName,
               groupFields: [
-                PropertyPaneTextField('description', {
-                  label: strings.DescriptionFieldLabel
-                })
-              ]
-            }
-          ]
-        }
-      ]
+                PropertyPaneTextField("description", {
+                  label: strings.DescriptionFieldLabel,
+                }),
+              ],
+            },
+          ],
+        },
+      ],
     };
   }
 }
