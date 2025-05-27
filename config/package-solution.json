@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "distributer-client-side-solution",
+    "id": "8f61010a-b5ce-4794-9130-2c0e584aac00",
+    "version": "1.0.0.0"
+  },
+  "paths": {
+    "zippedPackage": "solution/distributer.sppkg"
+  }
+}

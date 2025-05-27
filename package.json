@@ -1,0 +1,43 @@
+{
+  "name": "new-wp",
+  "version": "0.0.1",
+  "private": true,
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "scripts": {
+    "build": "gulp bundle",
+    "clean": "gulp clean",
+    "test": "gulp test"
+  },
+  "dependencies": {
+    "@microsoft/sp-core-library": "~1.1.0",
+    "@microsoft/sp-http": "^1.21.1",
+    "@microsoft/sp-lodash-subset": "~1.1.0",
+    "@microsoft/sp-office-ui-fabric-core": "~1.4.0-0",
+    "@microsoft/sp-webpart-base": "~1.1.0",
+    "@types/es6-promise": "0.0.33",
+    "@types/react-addons-shallow-compare": "0.14.17",
+    "@types/react-addons-test-utils": "0.14.15",
+    "@types/react-addons-update": "0.14.14",
+    "@types/react-dom": "0.14.18",
+    "@types/webpack-env": "1.13.1",
+    "moment-jalaali": "^0.10.4",
+    "react": "15.4.2",
+    "react-dom": "15.4.2",
+    "react-router": "^3.2.6",
+    "sp-pnp-js": "^2.0.3"
+  },
+  "devDependencies": {
+    "@microsoft/sp-build-web": "~1.1.0",
+    "@microsoft/sp-module-interfaces": "~1.1.0",
+    "@microsoft/sp-webpart-workbench": "~1.1.0",
+    "@types/chai": "3.4.34",
+    "@types/mocha": "2.2.38",
+    "@types/moment-jalaali": "^0.7.9",
+    "@types/react": "^0.14.46",
+    "ajv": "~5.2.2",
+    "gulp": "~3.9.1",
+    "tslint-microsoft-contrib": "~5.0.0"
+  }
+}

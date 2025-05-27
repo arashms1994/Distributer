@@ -1,0 +1,13 @@
+{
+  "entries": [
+    {
+      "entry": "./lib/webparts/distributer/DistributerWebPart.js",
+      "manifest": "./src/webparts/distributer/DistributerWebPart.manifest.json",
+      "outputPath": "./dist/distributer-web-part.js"
+    }
+  ],
+  "externals": {},
+  "localizedResources": {
+    "DistributerWebPartStrings": "webparts/distributer/loc/{locale}.js"
+  }
+}
