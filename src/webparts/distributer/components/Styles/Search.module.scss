@@ -1,0 +1,43 @@
+.searchBar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-direction: row;
+  max-width: 200px;
+  border: 1px solid rgb(116, 116, 116);
+  border-radius: 8px;
+  max-width: 250px;
+  background-color: rgb(243, 243, 243);
+
+  .searchInput {
+    height: 40px;
+    border: none;
+    width: 100%;
+    text-align: right;
+    padding-right: 4px;
+    outline: none;
+    font-size: 18px;
+    font-weight: 400;
+    direction: rtl;
+    background-color: rgb(243, 243, 243);
+    border-bottom-left-radius: 8px;
+    border-top-left-radius: 8px;
+  }
+
+  .searchSvg {
+    border-bottom-right-radius: 8px;
+    border-top-right-radius: 8px;
+    padding-inline: 4px;
+    background-color: rgb(243, 243, 243);
+  }
+}
+
+.filterSelection {
+  max-width: 250px;
+  height: 100%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-direction: row-reverse;
+  gap: 10px;
+}

@@ -1,0 +1,131 @@
+.productsDiv {
+  width: 75%;
+  flex-shrink: 0;
+  flex: 1;
+  min-height: 400px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 32px;
+  background-color: #ffffff;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: #ffffff;
+  margin-left: auto;
+}
+
+.successMessage {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #e6ffed;
+  color: #276749;
+  border: 1px solid #c6f6d5;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  animation: slideDown 0.3s ease-out;
+  font-weight: bolder;
+}
+
+.cardContainer {
+  .productCardLink {
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 300px;
+  min-height: 490px;
+  border-radius: 18px;
+  background-color: #ffffff;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+  padding: 20px;
+  transition: transform 0.25s ease-in-out;
+  box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px,
+    rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+}
+
+.cardHeader {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+  text-align: center;
+  transition: all 0.3s ease-in-out;
+
+  .productCardImg {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.cardDescription {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-end;
+  text-align: right;
+  margin-block: 16px;
+
+  .codeDescription {
+    margin-top: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #555;
+  }
+
+  .titleDescription {
+    font-weight: bolder;
+    color: black;
+    direction: rtl;
+    font-size: 18px;
+    font-weight: 600;
+  }
+}
+
+.cardBtn {
+  cursor: pointer;
+  transition: all 0.25s linear;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  background-color: #252525;
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background-color: #707070;
+    scale: (1.05);
+  }
+}
+
+.counterActions {
+  display: flex;
+  width: 100%;
+  flex-direction: row-reverse;
+  justify-content: center;
+  align-items: center;
+}
