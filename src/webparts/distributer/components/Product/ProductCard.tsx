@@ -41,7 +41,8 @@ export default class ProductCard extends React.Component<Product, any> {
   }
 
   handleAddToCart = async () => {
-    const { Title, Code, productgroup, IdCode, size, color } = this.props;
+    const { Title, Code, productgroup, IdCode, size, color, Inventory } =
+      this.props;
     const userGuid = localStorage.getItem("userGuid");
 
     try {
@@ -101,7 +102,7 @@ export default class ProductCard extends React.Component<Product, any> {
   };
 
   render() {
-    const { Title, Code, image } = this.props;
+    const { Title, Code, image, Inventory } = this.props;
     const { showCounter, itemId, showMessage } = this.state;
 
     return (
@@ -124,6 +125,7 @@ export default class ProductCard extends React.Component<Product, any> {
           >
             <p className={styles.titleDescription}>{Title}</p>
             <p className={styles.codeDescription}>کدکالا: {Code}</p>
+            <p className={styles.codeDescription}>موجودی: {Inventory}</p>
           </a>
         </div>
 
@@ -132,7 +134,7 @@ export default class ProductCard extends React.Component<Product, any> {
             <Counter
               Id={itemId}
               onDelete={this.handleCounterDeleted}
-              updateCartCount={this.props.updateCartCount} // ✅ اضافه شد
+              updateCartCount={this.props.updateCartCount}
             />
           ) : (
             <button

@@ -19,6 +19,7 @@ export default class ProductsDiv extends React.Component<
 
           return (
             <ProductCard
+              Inventory={p.Inventory}
               codegoods={p.codegoods}
               size={p.size}
               color={p.color}

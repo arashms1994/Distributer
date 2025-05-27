@@ -33,9 +33,11 @@
     "@microsoft/sp-module-interfaces": "~1.1.0",
     "@microsoft/sp-webpart-workbench": "~1.1.0",
     "@types/chai": "3.4.34",
+    "@types/history": "^3.2.2",
     "@types/mocha": "2.2.38",
     "@types/moment-jalaali": "^0.7.9",
     "@types/react": "^0.14.46",
+    "@types/react-router": "^3.0.7",
     "ajv": "~5.2.2",
     "gulp": "~3.9.1",
     "tslint-microsoft-contrib": "~5.0.0"

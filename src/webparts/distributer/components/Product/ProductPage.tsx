@@ -47,6 +47,7 @@ export default class ProductPage extends React.Component<any, any> {
       number_x002f_stringdiameter,
       Code,
       IdCode,
+      Inventory,
     } = item;
 
     let modifiedThermalClass = thermalclass;
@@ -98,9 +99,11 @@ export default class ProductPage extends React.Component<any, any> {
             دسته بندی:
             <span className={styles.productDetailsSPAN}>
               {productgroup ? (
-                `${ productgroup }`
+                `${productgroup}`
               ) : (
-                <small className={styles.productDetailsSMALL}>تعریف نشده </small>
+                <small className={styles.productDetailsSMALL}>
+                  تعریف نشده{" "}
+                </small>
               )}
             </span>
           </p>
@@ -111,13 +114,19 @@ export default class ProductPage extends React.Component<any, any> {
               {color ? (
                 color
               ) : (
-                <small className={styles.productDetailsSMALL}>تعریف نشده </small>
+                <small className={styles.productDetailsSMALL}>
+                  تعریف نشده{" "}
+                </small>
               )}
             </span>
           </p>
 
           <p className={styles.productDetailsP}>
             کدکالا: <span className={styles.productDetailsSPAN}>{Code}</span>
+          </p>
+
+          <p className={styles.productDetailsP}>
+            موجودی: <span className={styles.productDetailsSPAN}>{Inventory}</span>
           </p>
 
           <div style={{ display: "flex", flexDirection: "row-reverse" }}>
@@ -128,7 +137,7 @@ export default class ProductPage extends React.Component<any, any> {
                   size
                 ) : (
                   <small className={styles.productDetailsSMALL}>
-                    تعریف نشده 
+                    تعریف نشده
                   </small>
                 )}
               </span>
@@ -141,7 +150,9 @@ export default class ProductPage extends React.Component<any, any> {
               {modifiedThermalClass ? (
                 modifiedThermalClass
               ) : (
-                <small className={styles.productDetailsSMALL}>تعریف نشده </small>
+                <small className={styles.productDetailsSMALL}>
+                  تعریف نشده{" "}
+                </small>
               )}
             </span>
           </p>
@@ -152,7 +163,9 @@ export default class ProductPage extends React.Component<any, any> {
               {number_x002f_stringdiameter ? (
                 number_x002f_stringdiameter
               ) : (
-                <small className={styles.productDetailsSMALL}>تعریف نشده </small>
+                <small className={styles.productDetailsSMALL}>
+                  تعریف نشده{" "}
+                </small>
               )}
             </span>
           </p>
@@ -163,7 +176,9 @@ export default class ProductPage extends React.Component<any, any> {
               {ghotreshte ? (
                 ghotreshte
               ) : (
-                <small className={styles.productDetailsSMALL}>تعریف نشده </small>
+                <small className={styles.productDetailsSMALL}>
+                  تعریف نشده{" "}
+                </small>
               )}
             </span>
           </p>
