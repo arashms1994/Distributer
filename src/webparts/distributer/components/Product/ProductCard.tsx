@@ -125,11 +125,8 @@ export default class ProductCard extends React.Component<Product, any> {
           >
             <p className={styles.titleDescription}>{Title}</p>
 
-            <div className={styles.priceDiv}>
-              <p className={styles.codeDescription}>موجودی: {Inventory}</p>
-              <p className={styles.codeDescription}>قیمت: {Price}</p>
-            </div>
-
+            <p className={styles.codeDescription}>موجودی: {Inventory}</p>
+            <p className={styles.codeDescription}>قیمت: {Price}</p>
             <p className={styles.codeDescription}>کدکالا: {Code}</p>
           </a>
         </div>

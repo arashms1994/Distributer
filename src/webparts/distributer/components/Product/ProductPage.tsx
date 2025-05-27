@@ -131,7 +131,7 @@ export default class ProductPage extends React.Component<any, any> {
           </p>
 
           <p className={styles.productDetailsP}>
-            تعداد رشته:
+            موجودی:
             <span className={styles.productDetailsSPAN}>
               {Inventory ? (
                 Inventory
