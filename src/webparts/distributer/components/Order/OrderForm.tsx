@@ -153,7 +153,7 @@ export default class OrderForm extends Component<any, any> {
           showMessage: false,
         });
 
-        postToTaskCRM(String(this.state.testSmsOrderNumber));
+        postToTaskCRM(String(this.state.testSmsOrderNumber), fullName);
 
         const smsMessage = `جناب آقای ${fullName}  سفارش شما با شماره ${testSmsOrderNumber} ثبت شد`;
 
@@ -177,9 +177,9 @@ export default class OrderForm extends Component<any, any> {
           }
         );
         // --------------------------------------------------SMS TO ZARSIM CEO-----------------------------------------------------//
-        // const CSEsmsMessage = `سفارش با شماره ${testSmsOrderNumber} ثبت شد `;
-        // sendSmsToZarsimCEO(CSEsmsMessage, "09123146451");
-        // sendSmsToZarsimCEO(CSEsmsMessage, "09129643050");
+        const CSEsmsMessage = `سفارش با شماره ${testSmsOrderNumber} ثبت شد `;
+        sendSmsToZarsimCEO(CSEsmsMessage, "09123146451");
+        sendSmsToZarsimCEO(CSEsmsMessage, "09129643050");
 
         setTimeout(() => {
           localStorage.removeItem("userGuid");

@@ -1,3 +1,8 @@
+import { Environment, EnvironmentType } from "@microsoft/sp-core-library";
+import { getDigest } from "./GetDigest";
+import { CustomerInfo, SPUser } from "../IDistributerProps";
+declare var _spPageContextInfo: any;
+
 export async function loadItems(): Promise<any[]> {
   const webUrl = "https://crm.zarsim.com";
   const listName = "Store";
@@ -121,4 +126,79 @@ export async function loadImages(): Promise<any[]> {
     name: file.Name,
     url: file.ServerRelativeUrl,
   }));
+}
+
+export async function getCustomers() {
+  const siteUrl = "https://crm.zarsim.com";
+  const listName = "customer_info";
+  const url = `${siteUrl}/_api/web/lists/getbytitle('${listName}')/items`;
+
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        Accept: "application/json;odata=verbose",
+      },
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+
+    const data = await response.json();
+    return data.d;
+  } catch (error) {
+    console.error("Error fetching customer data:", error);
+    return null;
+  }
+}
+
+export async function getCurrentUser() {
+  try {
+    const response = await fetch(
+      `${_spPageContextInfo.webAbsoluteUrl}/_api/web/currentuser`,
+      {
+        headers: { Accept: "application/json;odata=verbose" },
+        credentials: "same-origin",
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+
+    const data = await response.json();
+    return data.d;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function getCustomerInfoByUserName(userName: string) {
+  const siteUrl = "https://crm.zarsim.com";
+  const listName = "customer_info";
+
+  const filter = `$filter=UserName eq '${userName}'`;
+  const url = `${siteUrl}/_api/web/lists/getbytitle('${listName}')/items?${filter}`;
+
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        Accept: "application/json;odata=verbose",
+      },
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+
+    const data = await response.json();
+    return data.d.results.at(0);
+  } catch (error) {
+    console.error("Error fetching filtered customer info:", error);
+    return null;
+  }
 }

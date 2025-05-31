@@ -1,7 +1,10 @@
 import moment = require("moment-jalaali");
 import { getDigest } from "./GetDigest";
 
-export async function postToTaskCRM(testSmsOrderNumber: string) {
+export async function postToTaskCRM(
+  testSmsOrderNumber: string,
+  fullName: string
+) {
   const webUrl = "https://crm.zarsim.com";
   const listName = "Task_CRM";
   const userGuid = localStorage.getItem("userGuid");
@@ -35,7 +38,7 @@ export async function postToTaskCRM(testSmsOrderNumber: string) {
         },
         body: JSON.stringify({
           __metadata: { type: itemType },
-          Title: "سفارش فروشگاه",
+          Title: `سفارش فروشگاهی جناب ${fullName}`,
           Order_GUID: userGuid,
           Created_Name: "سیستم",
           CreatedAccant: "i:0#.w|zarsim\\rashaadmin",
