@@ -47,7 +47,7 @@ export async function postToTaskCRM(
           ReceiverAccant: "menayati",
           ReceiverName: "شادی عنایتی",
           Status0: "ارجاع شده",
-          Order_Type: "0",
+          Order_Type: "1",
           Order_No: testSmsOrderNumber,
           DueDate: nowGregorian,
           DueDate_t: nowJalali,

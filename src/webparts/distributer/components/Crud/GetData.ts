@@ -1,6 +1,3 @@
-import { Environment, EnvironmentType } from "@microsoft/sp-core-library";
-import { getDigest } from "./GetDigest";
-import { CustomerInfo, SPUser } from "../IDistributerProps";
 declare var _spPageContextInfo: any;
 
 export async function loadItems(): Promise<any[]> {
@@ -126,32 +123,6 @@ export async function loadImages(): Promise<any[]> {
     name: file.Name,
     url: file.ServerRelativeUrl,
   }));
-}
-
-export async function getCustomers() {
-  const siteUrl = "https://crm.zarsim.com";
-  const listName = "customer_info";
-  const url = `${siteUrl}/_api/web/lists/getbytitle('${listName}')/items`;
-
-  try {
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        Accept: "application/json;odata=verbose",
-      },
-      credentials: "include",
-    });
-
-    if (!response.ok) {
-      throw new Error("Network response was not ok");
-    }
-
-    const data = await response.json();
-    return data.d;
-  } catch (error) {
-    console.error("Error fetching customer data:", error);
-    return null;
-  }
 }
 
 export async function getCurrentUser() {

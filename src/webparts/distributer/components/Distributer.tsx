@@ -1,13 +1,7 @@
 import * as React from "react";
 import { Component } from "react";
 import { IDistributerProps, Product } from "../components/IDistributerProps";
-import {
-  getCurrentUser,
-  getCustomerInfoByUserName,
-  getCustomers,
-  loadImages,
-  loadItems,
-} from "./Crud/GetData";
+import { loadImages, loadItems } from "./Crud/GetData";
 import styles from "./Styles/Distributer.module.scss";
 import ProductsDiv from "./Product/ProductsDiv";
 import FilterBar from "./Filter/FilterBar";
@@ -54,19 +48,6 @@ export default class Distributer extends Component<IDistributerProps, any> {
     }
 
     this.setState({ userGuid, items, imageUrl });
-
-    const users = await getCustomers();
-    console.log(users);
-
-    const user = await getCurrentUser();
-    console.log(user);
-
-    const currentUser = await getCurrentUser();
-    const nameId = currentUser.UserId.NameId;
-
-    const customerInfo = await getCustomerInfoByUserName(nameId);
-
-    console.log("Customer Info for current user:", customerInfo);
   }
 
   handleSearch(event) {
