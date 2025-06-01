@@ -7,7 +7,10 @@ const webUrl = "https://crm.zarsim.com";
 const listName = "shoping";
 const itemType = "SP.Data.ShopingListItem";
 
-export default class ProductCard extends React.Component<Product, any> {
+export default class ProductCard extends React.Component<
+  Product & { AgentPrice?: any },
+  any
+> {
   constructor(props) {
     super(props);
     this.state = {
@@ -102,7 +105,7 @@ export default class ProductCard extends React.Component<Product, any> {
   };
 
   render() {
-    const { Title, Code, image, Inventory, Price } = this.props;
+    const { Title, Code, image, Inventory, Price, AgentPrice } = this.props;
     const { showCounter, itemId, showMessage } = this.state;
 
     return (
@@ -124,9 +127,14 @@ export default class ProductCard extends React.Component<Product, any> {
             rel="noopener noreferrer"
           >
             <p className={styles.titleDescription}>{Title}</p>
-
             <p className={styles.codeDescription}>موجودی: {Inventory}</p>
-            <p className={styles.codeDescription}>قیمت: {Price}</p>
+            <p className={styles.codeDescription}>قیمت : {Price} تومان</p>
+            <p className={styles.codeDescription}>
+              قیمت برای شما:{" "}
+              {AgentPrice !== undefined && AgentPrice !== null
+                ? `${AgentPrice} تومان`
+                : "تعریف نشده"}
+            </p>
             <p className={styles.codeDescription}>کدکالا: {Code}</p>
           </a>
         </div>

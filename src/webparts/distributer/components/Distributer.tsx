@@ -1,11 +1,12 @@
 import * as React from "react";
 import { Component } from "react";
 import { IDistributerProps, Product } from "../components/IDistributerProps";
-import { loadImages, loadItems } from "./Crud/GetData";
+import { getCurrentUser, loadImages, loadItems } from "./Crud/GetData";
 import styles from "./Styles/Distributer.module.scss";
 import ProductsDiv from "./Product/ProductsDiv";
 import FilterBar from "./Filter/FilterBar";
 import uuidv4 from "./utils/createGuid";
+import { getDigest } from "./Crud/GetDigest";
 require("./Styles/font.css");
 
 function containsText(source: string, query: string): boolean {
@@ -24,6 +25,7 @@ export default class Distributer extends Component<IDistributerProps, any> {
       imageUrl: "",
       showMessage: false,
       searchQuery: "",
+      nameId: "",
       filters: {
         color: "",
         size: "",
@@ -40,6 +42,8 @@ export default class Distributer extends Component<IDistributerProps, any> {
   async componentDidMount() {
     const items = await loadItems();
     const imageUrl = await loadImages();
+    const currentUser = await getCurrentUser();
+    const nameId = currentUser.UserId.NameId;
 
     let userGuid = localStorage.getItem("userGuid");
     if (!userGuid) {
@@ -47,7 +51,7 @@ export default class Distributer extends Component<IDistributerProps, any> {
       localStorage.setItem("userGuid", userGuid);
     }
 
-    this.setState({ userGuid, items, imageUrl });
+    this.setState({ userGuid, items, imageUrl, nameId });
   }
 
   handleSearch(event) {
@@ -57,16 +61,6 @@ export default class Distributer extends Component<IDistributerProps, any> {
 
   goToCart() {
     window.location.hash = "#/cart";
-  }
-
-  async getDigest(): Promise<string> {
-    const webUrl = "https://crm.zarsim.com";
-    return fetch(`${webUrl}/_api/contextinfo`, {
-      method: "POST",
-      headers: { Accept: "application/json;odata=verbose" },
-    })
-      .then((res) => res.json())
-      .then((data) => data.d.GetContextWebInformation.FormDigestValue);
   }
 
   handleFilterChange = (filters: Partial<any>) => {
@@ -79,7 +73,7 @@ export default class Distributer extends Component<IDistributerProps, any> {
     const webUrl = "https://crm.zarsim.com";
 
     try {
-      const digest = await this.getDigest();
+      const digest = await getDigest();
 
       const response = await fetch(
         `${webUrl}/_api/web/lists/getbytitle('${listName}')/items`,
@@ -130,7 +124,7 @@ export default class Distributer extends Component<IDistributerProps, any> {
   }
 
   render() {
-    const { filters } = this.state;
+    const { filters, nameId } = this.state;
     const searchQuery = this.props.searchQuery || "";
 
     let filteredItems = this.state.items;
@@ -206,6 +200,7 @@ export default class Distributer extends Component<IDistributerProps, any> {
             products={filteredItems}
             cart={this.handleAddToCart}
             updateCartCount={this.props.updateCartCount}
+            nameId={this.state.nameId}
           />
         </div>
       </div>

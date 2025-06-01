@@ -70,6 +70,7 @@ export interface ProductsDivProps {
   cart: (id: number, title: string) => void;
   image: any;
   updateCartCount?: () => void;
+  nameId: string;
 }
 
 export interface CounterProps {

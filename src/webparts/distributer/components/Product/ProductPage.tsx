@@ -49,6 +49,7 @@ export default class ProductPage extends React.Component<any, any> {
       IdCode,
       Inventory,
       Price,
+      agentPrice,
     } = item;
 
     let modifiedThermalClass = thermalclass;
@@ -128,6 +129,15 @@ export default class ProductPage extends React.Component<any, any> {
 
           <p className={styles.productDetailsP}>
             قیمت: <span className={styles.productDetailsSPAN}>{Price}</span>
+          </p>
+
+          <p className={styles.productDetailsP}>
+            قیمت برای شما:
+            <span className={styles.productDetailsSPAN}>
+              {agentPrice || (
+                <small className={styles.productDetailsSMALL}>تعریف نشده</small>
+              )}
+            </span>
           </p>
 
           <p className={styles.productDetailsP}>

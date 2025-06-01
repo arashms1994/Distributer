@@ -71,9 +71,6 @@ export default class Cart extends Component<any, any> {
       const cartItems = await this.props.fetchCartItems();
       this.setState({ cartItems });
 
-      const user = await getCurrentUser();
-      console.log(user);
-
       const currentUser = await getCurrentUser();
       const nameId = currentUser.UserId.NameId;
 
@@ -117,103 +114,103 @@ export default class Cart extends Component<any, any> {
       .catch((err) => this.setState({ message: `خطا در حذف: ${err.message}` }));
   }
 
-  async handleOrder() {
-    try {
-      const userGuid = localStorage.getItem("userGuid");
-      if (!userGuid) {
-        this.setState({ message: "شناسه کاربری پیدا نشد." });
-        return;
+ async handleOrder() {
+  try {
+    const userGuid = localStorage.getItem("userGuid");
+    if (!userGuid) {
+      this.setState({ message: "شناسه کاربری پیدا نشد." });
+      return;
+    }
+
+    if (!this.state.phoneNumber) {
+      this.setState({ message: "شماره تلفن کاربر ثبت نشده است." });
+      return;
+    }
+
+    const { cartItems } = this.state;
+    if (cartItems.length === 0) {
+      this.setState({ message: "سبد خرید خالی است." });
+      return;
+    }
+
+    const webUrl = "https://crm.zarsim.com";
+    const listName = "Orders";
+    const digest = await getDigest();
+
+    const orderNumber = this.generateOrderId(0);
+    const updatedOrderNumber = this.incrementOrderId(orderNumber);
+
+    const orderRes = await fetch(
+      `${webUrl}/_api/web/lists/getbytitle('${listName}')/items`,
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json;odata=verbose",
+          "Content-Type": "application/json;odata=verbose",
+          "X-RequestDigest": digest,
+        },
+        body: JSON.stringify({
+          __metadata: { type: "SP.Data.OrdersListItem" },
+          guid_form: userGuid,
+          phoneNumber: this.state.phoneNumber,
+          Date: new Date().toISOString(),
+          CustomerName: this.state.fullName,
+          OrderNumber: "",
+        }),
       }
+    );
 
-      if (!this.state.phoneNumber) {
-        this.setState({ message: "شماره تلفن کاربر ثبت نشده است." });
-        return;
-      }
+    const orderData = await orderRes.json();
 
-      const { cartItems } = this.state;
-      if (cartItems.length === 0) {
-        this.setState({ message: "سبد خرید خالی است." });
-        return;
-      }
+    if (orderData.d) {
+      const itemId = orderData.d.Id;
+      const testSmsOrderNumber = itemId + 10000;
 
-      const webUrl = "https://crm.zarsim.com";
-      const listName = "Orders";
-      const digest = await getDigest();
-
-      const orderNumber = this.generateOrderId(0);
-      const updatedOrderNumber = this.incrementOrderId(orderNumber);
-
-      const orderRes = await fetch(
-        `${webUrl}/_api/web/lists/getbytitle('${listName}')/items`,
+      await fetch(
+        `${webUrl}/_api/web/lists/getbytitle('${listName}')/items(${itemId})`,
         {
           method: "POST",
           headers: {
             Accept: "application/json;odata=verbose",
             "Content-Type": "application/json;odata=verbose",
             "X-RequestDigest": digest,
+            "IF-MATCH": "*",
+            "X-HTTP-Method": "MERGE",
           },
           body: JSON.stringify({
             __metadata: { type: "SP.Data.OrdersListItem" },
-            guid_form: userGuid,
-            phoneNumber: this.state.phoneNumber,
-            Date: new Date().toISOString(),
-            CustomerName: this.state.fullName,
-            OrderNumber: "",
+            OrderNumber: testSmsOrderNumber.toString(),
           }),
         }
       );
 
-      const orderData = await orderRes.json();
+      postToTaskCRM(String(testSmsOrderNumber), this.state.fullName);
 
-      if (orderData.d) {
-        const itemId = orderData.d.Id;
-        const testSmsOrderNumber = itemId + 10000;
+      const smsMessage = `جناب ${this.state.fullName} سفارش شما با شماره ${testSmsOrderNumber} ثبت شد`;
+      const CSEsmsMessage = `سفارش جناب ${this.state.fullName} با شماره ${testSmsOrderNumber} ثبت شد `;
 
-        await fetch(
-          `${webUrl}/_api/web/lists/getbytitle('${listName}')/items(${itemId})`,
-          {
-            method: "POST",
-            headers: {
-              Accept: "application/json;odata=verbose",
-              "Content-Type": "application/json;odata=verbose",
-              "X-RequestDigest": digest,
-              "IF-MATCH": "*",
-              "X-HTTP-Method": "MERGE",
-            },
-            body: JSON.stringify({
-              __metadata: { type: "SP.Data.OrdersListItem" },
-              OrderNumber: testSmsOrderNumber.toString(),
-            }),
-          }
-        );
+      // sendSmsToZarsimCEO(CSEsmsMessage, "09129643050");
+      // sendSmsToZarsimCEO(CSEsmsMessage, "09123146451");
+      sendSmsToZarsimCEO(smsMessage, this.state.phoneNumber);
 
-        postToTaskCRM(String(testSmsOrderNumber), this.state.fullName);
+      this.setState({
+        message: "سفارش با موفقیت ثبت شد",
+        showSuccessPopup: true,
+        testSmsOrderNumber,
+        fullName: this.state.fullName,
+      });
 
-        const smsMessage = `جناب ${this.state.fullName} سفارش شما با شماره ${testSmsOrderNumber} ثبت شد`;
-        const CSEsmsMessage = `سفارش جناب ${this.state.fullName} با شماره ${testSmsOrderNumber} ثبت شد `;
-
-        // sendSmsToZarsimCEO(CSEsmsMessage, "09129643050");
-        // sendSmsToZarsimCEO(CSEsmsMessage, "09123146451");
-        sendSmsToZarsimCEO(smsMessage, this.state.phoneNumber);
-
-        this.setState({
-          message: "سفارش با موفقیت ثبت شد",
-          showSuccessPopup: true,
-          testSmsOrderNumber,
-          fullName: this.state.fullName,
-        });
-
-        setTimeout(() => {
-          localStorage.removeItem("userGuid");
-        }, 2000);
-      } else {
-        this.setState({ message: "خطا در ثبت سفارش" });
-      }
-    } catch (err) {
-      console.error("خطا در ثبت سفارش:", err);
+      setTimeout(() => {
+        localStorage.removeItem("userGuid");
+      }, 2000);
+    } else {
       this.setState({ message: "خطا در ثبت سفارش" });
     }
+  } catch (err) {
+    console.error("خطا در ثبت سفارش:", err);
+    this.setState({ message: "خطا در ثبت سفارش" });
   }
+}
 
   render() {
     return (
