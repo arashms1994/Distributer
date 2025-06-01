@@ -44,8 +44,16 @@ export default class ProductCard extends React.Component<
   }
 
   handleAddToCart = async () => {
-    const { Title, Code, productgroup, IdCode, size, color, Inventory } =
-      this.props;
+    const {
+      Title,
+      Code,
+      productgroup,
+      IdCode,
+      size,
+      color,
+      Inventory,
+      distributerPrice,
+    } = this.props;
     const userGuid = localStorage.getItem("userGuid");
 
     try {
@@ -73,6 +81,7 @@ export default class ProductCard extends React.Component<
             codegoods: Code,
             count: "1",
             guid_form: userGuid,
+            price: String(distributerPrice),
             productgroup,
             IdCode,
             size,

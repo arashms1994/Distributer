@@ -62,7 +62,7 @@ class Counter extends React.Component<any, any> {
         .then(() => {
           this.setState({ count: 0, displayCount: 0 });
           if (onDelete) onDelete(Id);
-          if (updateCartCount) updateCartCount(); // <-- اینجا اضافه شده
+          if (updateCartCount) updateCartCount();
         })
         .catch((error) => console.error("Delete item error:", error));
     } else {
