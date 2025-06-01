@@ -192,8 +192,8 @@ export default class Cart extends Component<any, any> {
         const smsMessage = `جناب ${this.state.fullName} سفارش شما با شماره ${testSmsOrderNumber} ثبت شد`;
         const CSEsmsMessage = `سفارش جناب ${this.state.fullName} با شماره ${testSmsOrderNumber} ثبت شد `;
 
-        sendSmsToZarsimCEO(CSEsmsMessage, "09129643050");
-        sendSmsToZarsimCEO(CSEsmsMessage, "09123146451");
+        // sendSmsToZarsimCEO(CSEsmsMessage, "09129643050");
+        // sendSmsToZarsimCEO(CSEsmsMessage, "09123146451");
         sendSmsToZarsimCEO(smsMessage, this.state.phoneNumber);
 
         this.setState({
