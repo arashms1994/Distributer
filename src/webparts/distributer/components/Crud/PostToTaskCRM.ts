@@ -18,6 +18,7 @@ export async function postToTaskCRM(
         headers: {
           Accept: "application/json;odata=verbose",
         },
+        credentials: "include",
       }
     );
 
@@ -36,10 +37,11 @@ export async function postToTaskCRM(
           "Content-Type": "application/json;odata=verbose",
           "X-RequestDigest": digest,
         },
+        credentials: "include",
         body: JSON.stringify({
           __metadata: { type: itemType },
           Title: `سفارش فروشگاهی جناب ${fullName}`,
-          Order_GUID: userGuid,
+          Order_GUID: String(userGuid),
           Created_Name: "سیستم",
           CreatedAccant: "i:0#.w|zarsim\\rashaadmin",
           off_status: "NO",
@@ -56,6 +58,11 @@ export async function postToTaskCRM(
         }),
       }
     );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`خطا در ثبت تسک: ${errorData.error.message.value}`);
+    }
 
     const result = await response.json();
     return result;

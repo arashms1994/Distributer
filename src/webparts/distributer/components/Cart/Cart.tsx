@@ -15,10 +15,11 @@ export default class Cart extends Component<any, any> {
       cartItems: [],
       message: "",
       showSuccessPopup: false,
-      testSmsOrderNumber: 1234,
+      testSmsOrderNumber: "",
       fullName: "",
       nameId: "",
       orderCountToday: 1,
+      phoneNumber: "",
       userInfo: [],
     };
 
@@ -142,14 +143,6 @@ export default class Cart extends Component<any, any> {
       const orderNumber = this.generateOrderId(0);
       const updatedOrderNumber = this.incrementOrderId(orderNumber);
 
-      console.log({
-        userGuid,
-        phoneNumber: this.state.phoneNumber,
-        Date: new Date().toISOString(),
-        CustomerName: this.state.fullName,
-        OrderNumber: String(this.state.testSmsOrderNumber),
-      });
-
       const orderRes = await fetch(
         `${webUrl}/_api/web/lists/getbytitle('${listName}')/items`,
         {
@@ -165,7 +158,7 @@ export default class Cart extends Component<any, any> {
             phoneNumber: this.state.phoneNumber,
             Date: new Date().toISOString(),
             CustomerName: this.state.fullName,
-            OrderNumber: String(this.state.testSmsOrderNumber),
+            OrderNumber: "",
           }),
         }
       );
@@ -173,31 +166,35 @@ export default class Cart extends Component<any, any> {
       const orderData = await orderRes.json();
 
       if (orderData.d) {
-        const testSmsOrderNumber = Number(orderData.d.Id) + 10000;
-
-        postToTaskCRM(String(testSmsOrderNumber), this.state.fullName);
-
-        const smsMessage = `جناب ${this.state.fullName} سفارش شما با شماره ${testSmsOrderNumber} ثبت شد`;
+        const itemId = orderData.d.Id;
+        const testSmsOrderNumber = itemId + 10000;
 
         await fetch(
-          `${webUrl}/_api/web/lists/getbytitle('SMSToCustomer')/items`,
+          `${webUrl}/_api/web/lists/getbytitle('${listName}')/items(${itemId})`,
           {
             method: "POST",
             headers: {
               Accept: "application/json;odata=verbose",
               "Content-Type": "application/json;odata=verbose",
               "X-RequestDigest": digest,
+              "IF-MATCH": "*",
+              "X-HTTP-Method": "MERGE",
             },
             body: JSON.stringify({
-              __metadata: { type: "SP.Data.SMSToCustomerListItem" },
-              Title: String(this.state.fullName),
-              Description: smsMessage,
-              Mobile: String(this.state.phoneNumber),
-              send_p: true,
-              send_e: false,
+              __metadata: { type: "SP.Data.OrdersListItem" },
+              OrderNumber: testSmsOrderNumber.toString(),
             }),
           }
         );
+
+        postToTaskCRM(String(testSmsOrderNumber), this.state.fullName);
+
+        const smsMessage = `جناب ${this.state.fullName} سفارش شما با شماره ${testSmsOrderNumber} ثبت شد`;
+        const CSEsmsMessage = `سفارش جناب ${this.state.fullName} با شماره ${testSmsOrderNumber} ثبت شد `;
+
+        sendSmsToZarsimCEO(CSEsmsMessage, "09129643050");
+        sendSmsToZarsimCEO(CSEsmsMessage, "09123146451");
+        sendSmsToZarsimCEO(smsMessage, this.state.phoneNumber);
 
         this.setState({
           message: "سفارش با موفقیت ثبت شد",
@@ -267,7 +264,3 @@ export default class Cart extends Component<any, any> {
     );
   }
 }
-
-// const CSEsmsMessage = `سفارش جناب ${this.state.fullName} با شماره ${testSmsOrderNumber} ثبت شد `;
-// sendSmsToZarsimCEO(CSEsmsMessage, "09129643050");
-// sendSmsToZarsimCEO(CSEsmsMessage, "09123146451");
