@@ -124,7 +124,7 @@ export default class Distributer extends Component<IDistributerProps, any> {
   }
 
   render() {
-    const { filters, nameId } = this.state;
+    const { filters } = this.state;
     const searchQuery = this.props.searchQuery || "";
 
     let filteredItems = this.state.items;

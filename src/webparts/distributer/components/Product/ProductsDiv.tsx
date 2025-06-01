@@ -13,7 +13,7 @@ export default class ProductsDiv extends React.Component<
     return (
       <div className={styles.productsDiv}>
         {products.map((p, i) => {
-          const agentPrice = p[nameId];
+          const distributerPrice = p[nameId];
 
           const matchedImage = image.find(
             (img) => img.name === `${p.IdCode}.jpg`
@@ -22,7 +22,7 @@ export default class ProductsDiv extends React.Component<
           return (
             <ProductCard
               Price={p.Price}
-              AgentPrice={agentPrice}
+              distributerPrice={distributerPrice}
               Inventory={p.Inventory}
               codegoods={p.codegoods}
               size={p.size}

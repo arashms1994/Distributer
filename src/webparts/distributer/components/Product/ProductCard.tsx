@@ -8,7 +8,7 @@ const listName = "shoping";
 const itemType = "SP.Data.ShopingListItem";
 
 export default class ProductCard extends React.Component<
-  Product & { AgentPrice?: any },
+  Product & { distributerPrice?: any },
   any
 > {
   constructor(props) {
@@ -105,7 +105,8 @@ export default class ProductCard extends React.Component<
   };
 
   render() {
-    const { Title, Code, image, Inventory, Price, AgentPrice } = this.props;
+    const { Title, Code, image, Inventory, Price, distributerPrice } =
+      this.props;
     const { showCounter, itemId, showMessage } = this.state;
 
     return (
@@ -131,8 +132,8 @@ export default class ProductCard extends React.Component<
             <p className={styles.codeDescription}>قیمت : {Price} تومان</p>
             <p className={styles.codeDescription}>
               قیمت برای شما:{" "}
-              {AgentPrice !== undefined && AgentPrice !== null
-                ? `${AgentPrice} تومان`
+              {distributerPrice !== undefined && distributerPrice !== null
+                ? `${distributerPrice} تومان`
                 : "تعریف نشده"}
             </p>
             <p className={styles.codeDescription}>کدکالا: {Code}</p>
