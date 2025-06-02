@@ -2,13 +2,14 @@ import * as React from "react";
 import { Product } from "../IDistributerProps";
 import Counter from "./Counter";
 import styles from "../Styles/Product.module.scss";
+import { getInventoryByCode } from "../Crud/GetData";
 
 const webUrl = "https://crm.zarsim.com";
 const listName = "shoping";
 const itemType = "SP.Data.ShopingListItem";
 
 export default class ProductCard extends React.Component<
-  Product & { distributerPrice?: any },
+  Product & { distributerPrice: any },
   any
 > {
   constructor(props) {
@@ -17,11 +18,17 @@ export default class ProductCard extends React.Component<
       showCounter: false,
       itemId: null,
       showMessage: false,
+      availableInventory: "",
     };
   }
 
   async componentDidMount() {
     const { Code } = this.props;
+    const availableInventory = await getInventoryByCode(Code);
+
+    this.setState({ availableInventory });
+    console.log("availableInventory:", availableInventory);
+
     const userGuid = localStorage.getItem("userGuid");
     try {
       const checkRes = await fetch(
@@ -44,16 +51,9 @@ export default class ProductCard extends React.Component<
   }
 
   handleAddToCart = async () => {
-    const {
-      Title,
-      Code,
-      productgroup,
-      IdCode,
-      size,
-      color,
-      Inventory,
-      distributerPrice,
-    } = this.props;
+    const { Title, Code, productgroup, IdCode, size, color, distributerPrice } =
+      this.props;
+
     const userGuid = localStorage.getItem("userGuid");
 
     try {
@@ -81,7 +81,6 @@ export default class ProductCard extends React.Component<
             codegoods: Code,
             count: "1",
             guid_form: userGuid,
-            price: String(distributerPrice),
             productgroup,
             IdCode,
             size,
@@ -113,8 +112,23 @@ export default class ProductCard extends React.Component<
     this.setState({ showCounter: false, itemId: null });
   };
 
+  getDisplayInventory() {
+    const { availableInventory } = this.state;
+    const { Inventory } = this.props;
+
+    if (
+      availableInventory !== null &&
+      availableInventory !== undefined &&
+      String(availableInventory).trim() !== ""
+    ) {
+      return availableInventory;
+    }
+
+    return Inventory;
+  }
+
   render() {
-    const { Title, Code, image, Inventory, Price, distributerPrice } =
+    const { Title, Code, image, Price, distributerPrice, Inventory } =
       this.props;
     const { showCounter, itemId, showMessage } = this.state;
 
@@ -137,7 +151,11 @@ export default class ProductCard extends React.Component<
             rel="noopener noreferrer"
           >
             <p className={styles.titleDescription}>{Title}</p>
-            <p className={styles.codeDescription}>موجودی: {Inventory}</p>
+
+            <p className={styles.codeDescription}>
+              موجودی(متر): {this.getDisplayInventory()}
+            </p>
+
             <p className={styles.codeDescription}>قیمت : {Price} تومان</p>
             <p className={styles.codeDescription}>
               قیمت برای شما:{" "}

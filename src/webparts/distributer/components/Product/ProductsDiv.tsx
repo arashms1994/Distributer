@@ -2,6 +2,7 @@ import * as React from "react";
 import ProductCard from "./ProductCard";
 import styles from "../Styles/Product.module.scss";
 import { ProductsDivProps } from "../IDistributerProps";
+import { getInventoryByCode } from "../Crud/GetData";
 
 export default class ProductsDiv extends React.Component<
   ProductsDivProps,
@@ -9,7 +10,7 @@ export default class ProductsDiv extends React.Component<
 > {
   render() {
     const { products, cart, image, nameId } = this.props;
-
+    
     return (
       <div className={styles.productsDiv}>
         {products.map((p, i) => {

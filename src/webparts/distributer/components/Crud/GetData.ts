@@ -173,3 +173,26 @@ export async function getCustomerInfoByUserName(userName: string) {
     return null;
   }
 }
+
+export async function getInventoryByCode(code: string) {
+  try {
+    const response = await fetch(
+      `https://crm.zarsim.com/_api/web/lists/getbytitle('orderableInventory')/items?$filter=Code eq '${code}'`,
+      {
+        method: "GET",
+        headers: {
+          Accept: "application/json;odata=verbose",
+        },
+      }
+    );
+
+    const data = await response.json();
+    console.log("Available Inventory:", data.d.results);
+    const objData=data.d.results.at(0);
+    const result=objData.orderableInventory;
+    return result;
+  } catch (error) {
+    console.error("Error fetching inventory:", error);
+    return [];
+  }
+}
