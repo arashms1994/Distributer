@@ -7,6 +7,7 @@ import moment = require("moment-jalaali");
 import { getCurrentUser, getCustomerInfoByUserName } from "../Crud/GetData";
 import { postToTaskCRM } from "../Crud/PostToTaskCRM";
 import sendSmsToZarsimCEO from "../utils/sendSms";
+import { hashHistory } from "react-router";
 
 export default class Cart extends Component<any, any> {
   constructor(props: any) {
@@ -14,6 +15,7 @@ export default class Cart extends Component<any, any> {
     this.state = {
       cartItems: [],
       message: "",
+      errMassage: "",
       showSuccessPopup: false,
       testSmsOrderNumber: "",
       fullName: "",
@@ -118,18 +120,18 @@ export default class Cart extends Component<any, any> {
     try {
       const userGuid = localStorage.getItem("userGuid");
       if (!userGuid) {
-        this.setState({ message: "شناسه کاربری پیدا نشد." });
+        this.setState({ errMassage: "شناسه کاربری پیدا نشد." });
         return;
       }
 
       if (!this.state.phoneNumber) {
-        this.setState({ message: "شماره تلفن کاربر ثبت نشده است." });
+        this.setState({ errMassage: "شماره تلفن کاربر ثبت نشده است." });
         return;
       }
 
       const { cartItems } = this.state;
       if (cartItems.length === 0) {
-        this.setState({ message: "سبد خرید خالی است." });
+        this.setState({ errMassage: "سبد خرید خالی است." });
         return;
       }
 
@@ -194,7 +196,7 @@ export default class Cart extends Component<any, any> {
         sendSmsToZarsimCEO(smsMessage, this.state.phoneNumber);
 
         this.setState({
-          message: "سفارش با موفقیت ثبت شد",
+          // message: "سفارش با موفقیت ثبت شد",
           showSuccessPopup: true,
           testSmsOrderNumber,
           fullName: this.state.fullName,
@@ -204,18 +206,18 @@ export default class Cart extends Component<any, any> {
           localStorage.removeItem("userGuid");
         }, 2000);
       } else {
-        this.setState({ message: "خطا در ثبت سفارش" });
+        this.setState({ errMassage: "خطا در ثبت سفارش" });
       }
     } catch (err) {
       console.error("خطا در ثبت سفارش:", err);
-      this.setState({ message: "خطا در ثبت سفارش" });
+      this.setState({ errMassage: "خطا در ثبت سفارش" });
     }
   }
 
   render() {
     return (
       <div className={styles.formContainer}>
-        {this.state.message && (
+        {this.state.errMassage && (
           <div className={styles.errorMessage}>
             <svg
               width="16"
@@ -232,7 +234,7 @@ export default class Cart extends Component<any, any> {
             <span>{this.state.message}</span>
             <button
               className={styles.closeBtn}
-              onClick={() => this.setState({ message: "" })}
+              onClick={() => this.setState({ errMassage: "" })}
             >
               ✕
             </button>
@@ -256,6 +258,44 @@ export default class Cart extends Component<any, any> {
           </div>
         ) : (
           <div className={styles.emptyCartMessage}>سبد خرید شما خالی است.</div>
+        )}
+        {this.state.showSuccessPopup && (
+          <div className={styles.orderPopupOverlay}>
+            <div className={styles.orderPopupBox}>
+              <h3 className={styles.orderPopupHeading}>ثبت سفارش موفق</h3>
+
+              <p className={styles.orderPopupParaph}>
+                مشتری عزیز، جناب {this.state.fullName}
+              </p>
+
+              <p className={styles.orderPopupParaph}>
+                سفارش شما با شماره{" "}
+                <span className={styles.popupHeading}>
+                  {this.state.testSmsOrderNumber}
+                </span>{" "}
+                ثبت شد.
+              </p>
+
+              <p className={styles.orderPopupParaph}>
+                همکاران ما پس از بررسی در اسرع وقت
+              </p>
+
+              <p className={styles.orderPopupParaph}>
+                با شما تماس خواهند گرفت.
+              </p>
+
+              <button
+                className={styles.closeOrderPopupBtn}
+                onClick={() => {
+                  localStorage.removeItem("userGuid");
+                  hashHistory.push("/");
+                  window.location.reload();
+                }}
+              >
+                تایید
+              </button>
+            </div>
+          </div>
         )}
       </div>
     );
