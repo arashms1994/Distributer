@@ -3,6 +3,7 @@ import { Product } from "../IDistributerProps";
 import Counter from "./Counter";
 import styles from "../Styles/Product.module.scss";
 import { getInventoryByCode } from "../Crud/GetData";
+import { addOrUpdateItemInOrderableInventory } from "../Crud/AddData";
 
 const webUrl = "https://crm.zarsim.com";
 const listName = "shoping";
@@ -19,6 +20,9 @@ export default class ProductCard extends React.Component<
       itemId: null,
       showMessage: false,
       availableInventory: "",
+      changeOrdarableInventory: false,
+      displayCount: "",
+      warning: "",
     };
   }
 
@@ -47,6 +51,37 @@ export default class ProductCard extends React.Component<
       }
     } catch (err) {
       console.error("خطا در بررسی سبد خرید:", err);
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      prevState.changeOrdarableInventory !==
+        this.state.changeOrdarableInventory &&
+      this.state.changeOrdarableInventory === true
+    ) {
+      this.handleChangeOrderableInventory();
+    }
+  }
+
+  async handleChangeOrderableInventory() {
+    const { Code } = this.props;
+    const { displayCount, availableInventory } = this.state;
+
+    const previousInventory = parseInt(availableInventory, 10);
+    const currentCount = parseInt(displayCount, 10);
+    const reduceAmount = currentCount; // یا اگر تفاوت می‌خواهید: currentCount - previousInventory
+
+    if (!isNaN(reduceAmount) && reduceAmount > 0) {
+      const updatedInventory = await addOrUpdateItemInOrderableInventory({
+        Code,
+        orderableInventory: String(reduceAmount),
+      });
+
+      this.setState({
+        changeOrdarableInventory: false,
+        availableInventory: updatedInventory,
+      });
     }
   }
 
@@ -127,6 +162,17 @@ export default class ProductCard extends React.Component<
     return Inventory;
   }
 
+  setchangeOrdarableInventory = (displayCount) => {
+    this.setState({
+      changeOrdarableInventory: true,
+      displayCount: displayCount,
+    });
+  };
+
+  setWarning = (message: string) => {
+    this.setState({ warning: message });
+  };
+
   render() {
     const { Title, Code, image, Price, distributerPrice, Inventory } =
       this.props;
@@ -155,6 +201,11 @@ export default class ProductCard extends React.Component<
             <p className={styles.codeDescription}>
               موجودی(متر): {this.getDisplayInventory()}
             </p>
+            {this.state.warning && (
+              <div className={styles.warningMessage}>
+                ⚠️ {this.state.warning}
+              </div>
+            )}
 
             <p className={styles.codeDescription}>قیمت : {Price} تومان</p>
             <p className={styles.codeDescription}>
@@ -170,9 +221,14 @@ export default class ProductCard extends React.Component<
         <div className={styles.counterActions}>
           {showCounter && itemId ? (
             <Counter
+              setchangeOrdarableInventory={this.setchangeOrdarableInventory}
+              Title={Title}
+              ProductCode={Code}
               Id={itemId}
               onDelete={this.handleCounterDeleted}
               updateCartCount={this.props.updateCartCount}
+              availableInventory={this.state.availableInventory}
+              setWarning={this.setWarning} // 👈 اضافه شود
             />
           ) : (
             <button

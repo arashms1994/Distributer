@@ -1,6 +1,7 @@
 import * as React from "react";
 import { getDigest } from "../Crud/GetDigest";
 import styles from "../Styles/Counter.module.scss";
+import { addOrUpdateItemInVirtualInventory } from "../Crud/AddData";
 
 class Counter extends React.Component<any, any> {
   private listName = "shoping";
@@ -12,6 +13,7 @@ class Counter extends React.Component<any, any> {
       count: 0,
       displayCount: 0,
       loading: true,
+      // اضافه شد
     };
   }
 
@@ -89,8 +91,20 @@ class Counter extends React.Component<any, any> {
   };
 
   increment = () => {
-    const newCount = this.state.displayCount + 1;
-    this.updateQuantity(newCount);
+    const { setWarning } = this.props;
+    const { displayCount } = this.state;
+    const maxCount = parseInt(this.props.availableInventory, 10) || Infinity;
+    const newCount = displayCount + 1;
+
+    if (newCount > maxCount) {
+      setWarning("مقدار انتخاب‌شده بیشتر از موجودی قابل سفارش است.");
+
+      return;
+    }
+    setWarning("");
+    this.setState(() => {
+      this.updateQuantity(newCount);
+    });
   };
 
   decrement = () => {
@@ -105,14 +119,35 @@ class Counter extends React.Component<any, any> {
   };
 
   handleInputChange = (e) => {
+    const { setWarning } = this.props;
     const value = parseInt(e.target.value, 10);
+    const maxCount = parseInt(this.props.availableInventory, 10) || Infinity;
     const newCount = isNaN(value) || value < 0 ? 0 : value;
-    this.setState({ displayCount: newCount });
+
+    if (newCount > maxCount) {
+      setWarning("مقدار انتخاب‌شده بیشتر از موجودی قابل سفارش است.");
+
+      // گزینه: میتونی مقدار نمایش رو به maxCount محدود کنی
+      this.setState({ displayCount: maxCount });
+    } else {
+      setWarning("");
+      this.setState({ displayCount: newCount });
+    }
   };
 
-  handleInputBlur = () => {
+  handleInputBlur = async () => {
+    const { ProductCode, Title, setchangeOrdarableInventory } = this.props;
     const { displayCount } = this.state;
     this.updateQuantity(displayCount);
+    const guid_form = localStorage.getItem("userGuid");
+    await addOrUpdateItemInVirtualInventory({
+      guid_form: String(guid_form),
+      ProductCode: String(ProductCode),
+      status: 0,
+      reserveInventory: String(displayCount),
+      Title: String(Title),
+    });
+    setchangeOrdarableInventory(displayCount);
   };
 
   render() {

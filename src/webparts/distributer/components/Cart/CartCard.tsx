@@ -22,7 +22,12 @@ export default class CartCard extends React.Component<CartItemProps, any> {
             حذف
           </button>
 
-          <Counter Id={product.Id} onDelete={onDelete} />
+          <Counter
+            Title={product.Title}
+            Id={product.Id}
+            ProductCode={product.codegoods}
+            onDelete={onDelete}
+          />
         </div>
       </div>
     );
