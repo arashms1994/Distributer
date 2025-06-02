@@ -5,7 +5,7 @@ import Counter from "../Product/Counter";
 
 export default class CartCard extends React.Component<CartItemProps, any> {
   render() {
-    const { product, onDelete } = this.props;
+    const { product, onDelete, onCountChange } = this.props;
 
     return (
       <div className={styles.cardContainer}>
@@ -22,7 +22,14 @@ export default class CartCard extends React.Component<CartItemProps, any> {
             حذف
           </button>
 
-          <Counter Id={product.Id} onDelete={onDelete} />
+          <Counter
+            Id={product.Id}
+            onDelete={onDelete}
+            onCountChange={(count) => onCountChange(product.Id, count)} 
+            guid_form={localStorage.getItem("userGuid")}
+            Title={product.Title}
+            codegoods={product.codegoods}
+          />
         </div>
       </div>
     );

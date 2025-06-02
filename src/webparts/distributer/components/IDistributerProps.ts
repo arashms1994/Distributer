@@ -12,12 +12,13 @@ export interface Image {
 
 export interface CartProps {
   userGuid: string;
-  refresh?: boolean;
+  refresh: boolean;
 }
 
 export interface CartItemProps {
   product: Product;
   onDelete: (id: number) => void;
+  onCountChange: (id: number, newCount: number) => void;
 }
 
 export interface CrudFormProps {
@@ -37,6 +38,7 @@ export interface Item {
 export interface CartListProps {
   products: Product[];
   onDelete: (id: number) => void;
+  onCountChange?: (id: number, newCount: number) => void;
 }
 
 export interface CrudMessageProps {

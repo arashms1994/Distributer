@@ -65,6 +65,11 @@ export default class Cart extends Component<any, any> {
     const currentOrderNumber = parseInt(String(orderId), 10);
     return (currentOrderNumber + 1000).toString();
   }
+  handleCountChange = (id: number, newCount: number) => {
+    // این تابع هر بار که شمارنده تغییر کند اجرا می‌شود
+    console.log("Updated count for item", id, ":", newCount);
+    this.props.addOrUpdateItemInVirtualInventory(id, newCount);
+  };
 
   async componentDidMount() {
     try {
@@ -242,6 +247,7 @@ export default class Cart extends Component<any, any> {
         <CartList
           products={this.state.cartItems}
           onDelete={this.handleDeleteItem}
+          onCountChange={this.handleCountChange}
         />
 
         {this.state.cartItems.length > 0 ? (

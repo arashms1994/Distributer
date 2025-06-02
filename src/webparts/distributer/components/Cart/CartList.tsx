@@ -5,12 +5,17 @@ import styles from "../Styles/Cart.module.scss";
 
 export default class CartList extends React.Component<CartListProps, any> {
   render() {
-    const { products, onDelete } = this.props;
+    const { products, onDelete, onCountChange } = this.props;
 
     return (
       <div className={styles.productsDiv}>
         {products.map((product) => (
-          <CartCard product={product} key={product.Id} onDelete={onDelete} />
+          <CartCard
+            product={product}
+            key={product.Id}
+            onDelete={onDelete}
+            onCountChange={onCountChange}
+          />
         ))}
       </div>
     );
