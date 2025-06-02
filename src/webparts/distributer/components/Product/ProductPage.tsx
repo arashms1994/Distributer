@@ -1,5 +1,9 @@
 import * as React from "react";
-import { loadImages, loadItemByCode } from "../Crud/GetData";
+import {
+  getInventoryByCode,
+  loadImages,
+  loadItemByCode,
+} from "../Crud/GetData";
 import styles from "../Styles/ProductPage.module.scss";
 import { Image } from "../IDistributerProps";
 
@@ -11,14 +15,21 @@ export default class ProductPage extends React.Component<any, any> {
       loading: true,
       error: "",
       imageUrl: undefined,
+      availableInventory: "",
     };
   }
 
   async componentDidMount() {
     const { Code } = this.props.params;
+    const availableInventory = await getInventoryByCode(Code);
+    this.setState({ availableInventory });
+
+    console.log("availableInventory", availableInventory);
+
 
     try {
       const item = await loadItemByCode(Code);
+      console.log(item);
       const imageUrl: Image[] = await loadImages();
       this.setState({
         imageUrl,
@@ -31,7 +42,7 @@ export default class ProductPage extends React.Component<any, any> {
   }
 
   render() {
-    const { item, loading, error, imageUrl } = this.state;
+    const { item, loading, error, imageUrl, availableInventory } = this.state;
 
     if (loading) return <p>در حال بارگذاری...</p>;
     if (error) return <p>خطا :{error}</p>;
@@ -103,9 +114,7 @@ export default class ProductPage extends React.Component<any, any> {
               {productgroup ? (
                 `${productgroup}`
               ) : (
-                <small className={styles.productDetailsSMALL}>
-                  تعریف نشده{" "}
-                </small>
+                <small className={styles.productDetailsSMALL}>تعریف نشده</small>
               )}
             </span>
           </p>
@@ -143,11 +152,9 @@ export default class ProductPage extends React.Component<any, any> {
           <p className={styles.productDetailsP}>
             موجودی:
             <span className={styles.productDetailsSPAN}>
-              {Inventory ? (
-                Inventory
-              ) : (
-                <small className={styles.productDetailsSMALL}>ناموجود</small>
-              )}
+              {availableInventory !== "" && availableInventory !== null
+                ? availableInventory
+                : Inventory}
             </span>
           </p>
 

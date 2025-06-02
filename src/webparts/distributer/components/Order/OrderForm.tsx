@@ -1,7 +1,6 @@
 import * as React from "react";
 import { Component } from "react";
 import styles from "../Styles/Order.module.scss";
-import { hashHistory } from "react-router";
 import * as moment from "moment-jalaali";
 import { loadCard } from "../Crud/GetData";
 import { postToTaskCRM } from "../Crud/PostToTaskCRM";
@@ -247,42 +246,7 @@ export default class OrderForm extends Component<any, any> {
             </button>
           </form>
 
-          {this.state.showSuccessPopup && (
-            <div className={styles.popupOverlay}>
-              <div className={styles.popupBox}>
-                <h3 className={styles.popupHeading}>ثبت سفارش موفق</h3>
-
-                <p className={styles.popupParaph}>
-                  مشتری عزیز، جناب {this.state.fullName}
-                </p>
-
-                <p className={styles.popupParaph}>
-                  سفارش شما با شماره{" "}
-                  <span className={styles.popupHeading}>
-                    {this.state.testSmsOrderNumber}
-                  </span>{" "}
-                  ثبت شد.
-                </p>
-
-                <p className={styles.popupParaph}>
-                  همکاران ما پس از بررسی در اسرع وقت
-                </p>
-
-                <p className={styles.popupParaph}>با شما تماس خواهند گرفت.</p>
-
-                <button
-                  className={styles.closePopupBtn}
-                  onClick={() => {
-                    localStorage.removeItem("userGuid");
-                    hashHistory.push("/");
-                    window.location.reload();
-                  }}
-                >
-                  تایید
-                </button>
-              </div>
-            </div>
-          )}
+          
         </div>
       </div>
     );
