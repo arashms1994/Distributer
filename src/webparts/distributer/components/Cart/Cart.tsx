@@ -88,6 +88,13 @@ export default class Cart extends Component<any, any> {
     }
   }
 
+  calcaluateTheToatalPrice = () => {
+    const totalAmount = this.state.cartItems.reduce(
+      (sum, item) => sum + (Number(item.priceAfterDiscount) || 0),
+      0
+    );
+  };
+
   handleDeleteItem(id: number) {
     const listName = "shoping";
     const webUrl = "https://crm.zarsim.com";
@@ -244,6 +251,7 @@ export default class Cart extends Component<any, any> {
         <CartList
           products={this.state.cartItems}
           onDelete={this.handleDeleteItem}
+          onUpdateItem={() => this.calcaluateTheToatalPrice()}
         />
 
         {this.state.cartItems.length > 0 ? (

@@ -18,6 +18,7 @@ export interface CartProps {
 export interface CartItemProps {
   product: Product;
   onDelete: (id: number) => void;
+  onUpdateItem?: () => void; 
 }
 
 export interface CrudFormProps {
@@ -37,6 +38,7 @@ export interface Item {
 export interface CartListProps {
   products: Product[];
   onDelete: (id: number) => void;
+  onUpdateItem?: () => void; // ← این خط مهمه
 }
 
 export interface CrudMessageProps {

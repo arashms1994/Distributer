@@ -98,11 +98,12 @@ class Counter extends React.Component<any, any> {
 
     if (newCount > maxCount) {
       setWarning("مقدار انتخاب‌شده بیشتر از موجودی قابل سفارش است.");
-
       return;
     }
+
     setWarning("");
     await this.updateQuantity(newCount);
+    this.props.onUpdateItem && this.props.onUpdateItem(); // ✅ اضافه شد
   };
 
   decrement = () => {
@@ -110,9 +111,11 @@ class Counter extends React.Component<any, any> {
     if (current === 1) {
       this.setState({ displayCount: 0 });
       this.updateQuantity(0);
+      this.props.onUpdateItem && this.props.onUpdateItem(); // ✅ اضافه شد
     } else {
       const newCount = Math.max(0, current - 1);
       this.updateQuantity(newCount);
+      this.props.onUpdateItem && this.props.onUpdateItem(); // ✅ اضافه شد
     }
   };
 
@@ -136,7 +139,10 @@ class Counter extends React.Component<any, any> {
   handleInputBlur = async () => {
     const { ProductCode, Title, setchangeOrdarableInventory } = this.props;
     const { displayCount } = this.state;
-    this.updateQuantity(displayCount);
+
+    await this.updateQuantity(displayCount);
+    this.props.onUpdateItem && this.props.onUpdateItem(); // ✅ اضافه شد
+
     const guid_form = localStorage.getItem("userGuid");
     await addOrUpdateItemInVirtualInventory({
       guid_form: String(guid_form),
@@ -145,6 +151,7 @@ class Counter extends React.Component<any, any> {
       reserveInventory: String(displayCount),
       Title: String(Title),
     });
+
     setchangeOrdarableInventory(displayCount);
   };
 

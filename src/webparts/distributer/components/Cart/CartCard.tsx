@@ -49,6 +49,7 @@ export default class CartCard extends React.Component<CartItemProps, any> {
           </button>
 
           <Counter
+            onUpdateItem={this.props.onUpdateItem}
             setchangeOrdarableInventory={this.setchangeOrdarableInventory}
             Title={Title}
             ProductCode={Code}
