@@ -51,7 +51,6 @@ export async function loadItemByCode(code: string) {
   }
 }
 
-
 export async function loadCard(filterGuidForm: string): Promise<any[]> {
   const webUrl = "https://crm.zarsim.com";
   const listName = "shoping";

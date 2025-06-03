@@ -22,6 +22,9 @@ export default class Cart extends Component<any, any> {
       nameId: "",
       orderCountToday: 1,
       phoneNumber: "",
+      expertAcc: "",
+      expertName: "",
+      expertMobile: "",
       userInfo: [],
     };
 
@@ -75,14 +78,23 @@ export default class Cart extends Component<any, any> {
 
       const currentUser = await getCurrentUser();
       const nameId = currentUser.UserId.NameId;
-
       const customerInfo = await getCustomerInfoByUserName(nameId);
+
       const fullName = customerInfo.Title || "";
       const phoneNumber = customerInfo.Mobile || "";
+      const expertName = customerInfo.SalesExpert || "";
+      const expertMobile = customerInfo.SalesExpertMobile || "";
+      const expertAcc_text = customerInfo.SalesExpertAcunt_text || "";
+      const expertAcc = expertAcc_text.split("\\")[1];
 
-      console.log("phone:", phoneNumber, "user:", fullName);
-
-      this.setState({ nameId, fullName, phoneNumber });
+      this.setState({
+        nameId,
+        fullName,
+        phoneNumber,
+        expertAcc,
+        expertName,
+        expertMobile,
+      });
     } catch (err) {
       this.setState({ message: `خطا در بارگذاری سبد خرید: ${err.message}` });
     }
@@ -186,13 +198,18 @@ export default class Cart extends Component<any, any> {
           }
         );
 
-        postToTaskCRM(String(testSmsOrderNumber), this.state.fullName);
+        postToTaskCRM(
+          String(testSmsOrderNumber),
+          this.state.fullName,
+          String(this.state.expertAcc),
+          String(this.state.expertName)
+        );
 
         const smsMessage = `جناب ${this.state.fullName} سفارش شما با شماره ${testSmsOrderNumber} ثبت شد`;
         const CSEsmsMessage = `سفارش جناب ${this.state.fullName} با شماره ${testSmsOrderNumber} ثبت شد `;
 
-        // sendSmsToZarsimCEO(CSEsmsMessage, "09129643050");
         // sendSmsToZarsimCEO(CSEsmsMessage, "09123146451");
+        sendSmsToZarsimCEO(CSEsmsMessage, this.state.SalesExpertMobile);
         sendSmsToZarsimCEO(smsMessage, this.state.phoneNumber);
 
         this.setState({
