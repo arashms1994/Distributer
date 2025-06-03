@@ -90,7 +90,7 @@ class Counter extends React.Component<any, any> {
     }
   };
 
-  increment = () => {
+  increment = async () => {
     const { setWarning } = this.props;
     const { displayCount } = this.state;
     const maxCount = parseInt(this.props.availableInventory, 10) || Infinity;
@@ -102,9 +102,7 @@ class Counter extends React.Component<any, any> {
       return;
     }
     setWarning("");
-    this.setState(() => {
-      this.updateQuantity(newCount);
-    });
+    await this.updateQuantity(newCount);
   };
 
   decrement = () => {
@@ -131,7 +129,7 @@ class Counter extends React.Component<any, any> {
       this.setState({ displayCount: maxCount });
     } else {
       setWarning("");
-      this.setState({ displayCount: newCount });
+      this.setState({ displayCount: newCount, count: newCount }); // ← بهتره مقدار واقعی را هم نگه‌داری
     }
   };
 

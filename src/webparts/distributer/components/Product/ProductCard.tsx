@@ -2,7 +2,11 @@ import * as React from "react";
 import { Product } from "../IDistributerProps";
 import Counter from "./Counter";
 import styles from "../Styles/Product.module.scss";
-import { getInventoryByCode } from "../Crud/GetData";
+import {
+  getInventoryByCode,
+  loadItemByCode,
+  loadReserveInventoryByCode,
+} from "../Crud/GetData";
 import { addOrUpdateItemInOrderableInventory } from "../Crud/AddData";
 
 const webUrl = "https://crm.zarsim.com";
@@ -28,13 +32,30 @@ export default class ProductCard extends React.Component<
 
   async componentDidMount() {
     const { Code } = this.props;
-    const availableInventory = await getInventoryByCode(Code);
 
-    this.setState({ availableInventory });
-    console.log("availableInventory:", availableInventory);
-
-    const userGuid = localStorage.getItem("userGuid");
     try {
+      const ItemStore = await loadItemByCode(Code);
+      if (!ItemStore || typeof ItemStore.Inventory === "undefined") {
+        console.warn("کالا با این کد پیدا نشد یا موجودی تعریف نشده است:", Code);
+        return;
+      }
+
+      const actualInventory = ItemStore.Inventory;
+
+      const reserveItems = await loadReserveInventoryByCode(Code);
+      const totalReserveInventory = reserveItems.reduce(
+        (sum, item) => sum + (Number(item.reserveInventory) || 0),
+        0
+      );
+
+      const updatedInventory = Number(actualInventory - totalReserveInventory);
+
+      this.setState({
+        changeOrdarableInventory: false,
+        availableInventory: updatedInventory,
+      });
+
+      const userGuid = localStorage.getItem("userGuid");
       const checkRes = await fetch(
         `${webUrl}/_api/web/lists/getbytitle('${listName}')/items?$filter=guid_form eq '${userGuid}' and codegoods eq '${Code}'`,
         {
@@ -50,7 +71,7 @@ export default class ProductCard extends React.Component<
         });
       }
     } catch (err) {
-      console.error("خطا در بررسی سبد خرید:", err);
+      console.error("خطا در componentDidMount ProductCard:", err);
     }
   }
 
@@ -66,23 +87,25 @@ export default class ProductCard extends React.Component<
 
   async handleChangeOrderableInventory() {
     const { Code } = this.props;
-    const { displayCount, availableInventory } = this.state;
 
-    const previousInventory = parseInt(availableInventory, 10);
-    const currentCount = parseInt(displayCount, 10);
-    const reduceAmount = currentCount; // یا اگر تفاوت می‌خواهید: currentCount - previousInventory
+    const ItemStore = await loadItemByCode(Code);
+    const actualInventory = ItemStore.Inventory;
 
-    if (!isNaN(reduceAmount) && reduceAmount > 0) {
-      const updatedInventory = await addOrUpdateItemInOrderableInventory({
-        Code,
-        orderableInventory: String(reduceAmount),
-      });
+    const toatalReserveInventoryByProductCode =
+      await loadReserveInventoryByCode(Code);
+    const totalReserveInventory = toatalReserveInventoryByProductCode.reduce(
+      (sum, item) => {
+        return sum + (Number(item.reserveInventory) || 0);
+      },
+      0
+    );
 
-      this.setState({
-        changeOrdarableInventory: false,
-        availableInventory: updatedInventory,
-      });
-    }
+    const updatedInventory = Number(actualInventory - totalReserveInventory);
+
+    this.setState({
+      changeOrdarableInventory: false,
+      availableInventory: updatedInventory,
+    });
   }
 
   handleAddToCart = async () => {
@@ -133,6 +156,7 @@ export default class ProductCard extends React.Component<
 
       if (this.props.updateCartCount) {
         this.props.updateCartCount();
+        await this.handleChangeOrderableInventory();
       }
 
       setTimeout(() => {
