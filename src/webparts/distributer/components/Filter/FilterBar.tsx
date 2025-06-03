@@ -3,7 +3,7 @@ import { Component } from "react";
 import styles from "../Styles/Filter.module.scss";
 import { FilterBarProps, FilterBarState, Product } from "../IDistributerProps";
 
-const SUB_CATEGORIES = ["AV", "AVSS", "T1", "T2", "T3"];
+const SUB_CATEGORIES = ["AVSS", "T1", "T2", "T3"];
 
 class FilterBar extends Component<FilterBarProps, FilterBarState> {
   constructor(props: FilterBarProps) {
