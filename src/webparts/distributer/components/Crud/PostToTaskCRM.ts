@@ -3,7 +3,9 @@ import { getDigest } from "./GetDigest";
 
 export async function postToTaskCRM(
   testSmsOrderNumber: string,
-  fullName: string
+  fullName: string,
+  expertAcc: string,
+  expertName: string
 ) {
   const webUrl = "https://crm.zarsim.com";
   const listName = "Task_CRM";
@@ -46,8 +48,8 @@ export async function postToTaskCRM(
           CreatedAccant: "i:0#.w|zarsim\\rashaadmin",
           off_status: "NO",
           OrderType: "عادی",
-          ReceiverAccant: "menayati",
-          ReceiverName: "شادی عنایتی",
+          ReceiverAccant: expertAcc,
+          ReceiverName: expertName,
           Status0: "ارجاع شده",
           Order_Type: "1",
           Order_No: testSmsOrderNumber,
