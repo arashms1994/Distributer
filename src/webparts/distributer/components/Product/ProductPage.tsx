@@ -19,21 +19,46 @@ export default class ProductPage extends React.Component<any, any> {
     };
   }
 
+  async extractWireDetails(title: string) {
+    const regex = /(\d+(\.\d+)?)\s*\*\s*(\d+)/;
+    const match = title.match(regex);
+
+    if (match) {
+      return {
+        ghotreshte: match[1],
+        number_x002f_stringdiameter: match[3],
+      };
+    }
+
+    return {
+      ghotreshte: null,
+      number_x002f_stringdiameter: null,
+    };
+  }
+
   async componentDidMount() {
     const { Code } = this.props.params;
-    const availableInventory = await getInventoryByCode(Code);
-    this.setState({ availableInventory });
-
-    console.log("availableInventory", availableInventory);
-
 
     try {
+      const availableInventory = await getInventoryByCode(Code);
+      this.setState({ availableInventory });
+      console.log("availableInventory", availableInventory);
+
       const item = await loadItemByCode(Code);
-      console.log(item);
+      console.log("item", item);
       const imageUrl: Image[] = await loadImages();
+
+      const extracted = this.extractWireDetails(item.Title || "");
+
       this.setState({
         imageUrl,
-        item,
+        item: {
+          ...item,
+          ghotreshte: item.ghotreshte || (await extracted).ghotreshte,
+          number_x002f_stringdiameter:
+            item.number_x002f_stringdiameter ||
+            (await extracted).number_x002f_stringdiameter,
+        },
         loading: false,
       });
     } catch (err) {
