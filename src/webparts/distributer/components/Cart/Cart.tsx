@@ -26,6 +26,9 @@ export default class Cart extends Component<any, any> {
       expertAcc: "",
       expertName: "",
       expertMobile: "",
+      expertAcc: "",
+      expertName: "",
+      expertMobile: "",
       userInfo: [],
       totalAmount: 0,
     };
@@ -194,9 +197,12 @@ export default class Cart extends Component<any, any> {
           String(this.state.expertName)
         );
 
-        const smsText = `سفارش شما با شماره ${testSmsOrderNumber} ثبت شد`;
-        sendSmsToZarsimCEO(smsText, this.state.phoneNumber);
-        sendSmsToZarsimCEO(smsText, this.state.expertMobile);
+        const smsMessage = `جناب ${this.state.fullName} سفارش شما با شماره ${testSmsOrderNumber} ثبت شد`;
+        const CSEsmsMessage = `سفارش جناب ${this.state.fullName} با شماره ${testSmsOrderNumber} ثبت شد `;
+
+        // sendSmsToZarsimCEO(CSEsmsMessage, "09123146451");
+        sendSmsToZarsimCEO(CSEsmsMessage, this.state.SalesExpertMobile);
+        sendSmsToZarsimCEO(smsMessage, this.state.phoneNumber);
 
         this.setState({ showSuccessPopup: true, testSmsOrderNumber });
       }
