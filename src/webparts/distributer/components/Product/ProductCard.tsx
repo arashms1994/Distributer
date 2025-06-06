@@ -109,8 +109,16 @@ export default class ProductCard extends React.Component<
   }
 
   handleAddToCart = async () => {
-    const { Title, Code, productgroup, IdCode, size, color, distributerPrice } =
-      this.props;
+    const {
+      Title,
+      Code,
+      productgroup,
+      IdCode,
+      size,
+      color,
+      distributerPrice,
+      Price,
+    } = this.props;
 
     const userGuid = localStorage.getItem("userGuid");
 
@@ -143,6 +151,7 @@ export default class ProductCard extends React.Component<
             IdCode,
             size,
             color,
+            price: Price,
           }),
         }
       );
