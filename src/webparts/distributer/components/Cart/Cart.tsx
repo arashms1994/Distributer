@@ -77,25 +77,24 @@ export default class Cart extends Component<any, any> {
     try {
       const cartItems = await this.props.fetchCartItems();
       const currentUser = await getCurrentUser();
-      const customerInfo = await getCustomerInfoByUserName(
-        currentUser.UserId.NameId
-      );
-      const expertAcc = (customerInfo.SalesExpertAcunt_text || "").split(
-        "\\"
-      )[1];
+      const nameId = currentUser.UserId.NameId;
+      const customerInfo = await getCustomerInfoByUserName(nameId);
 
-      this.setState(
-        {
-          cartItems,
-          nameId: currentUser.UserId.NameId,
-          fullName: customerInfo.Title || "",
-          phoneNumber: customerInfo.Mobile || "",
-          expertAcc: expertAcc,
-          expertName: customerInfo.SalesExpert || "",
-          expertMobile: customerInfo.SalesExpertMobile || "",
-        },
-        this.calcaluateTheToatalPrice // 💡 محاسبه اولیه
-      );
+      const fullName = customerInfo.Title || "";
+      const phoneNumber = customerInfo.Mobile || "";
+      const expertName = customerInfo.SalesExpert || "";
+      const expertMobile = customerInfo.SalesExpertMobile || "";
+      const expertAcc_text = customerInfo.SalesExpertAcunt_text || "";
+      const expertAcc = expertAcc_text.split("\\")[1];
+
+      this.setState({
+        nameId,
+        fullName,
+        phoneNumber,
+        expertAcc,
+        expertName,
+        expertMobile,
+      });
     } catch (err) {
       this.setState({ message: `خطا در بارگذاری سبد خرید: ${err.message}` });
     }
@@ -194,9 +193,12 @@ export default class Cart extends Component<any, any> {
           String(this.state.expertName)
         );
 
-        const smsText = `سفارش شما با شماره ${testSmsOrderNumber} ثبت شد`;
-        sendSmsToZarsimCEO(smsText, this.state.phoneNumber);
-        sendSmsToZarsimCEO(smsText, this.state.expertMobile);
+        const smsMessage = `جناب ${this.state.fullName} سفارش شما با شماره ${testSmsOrderNumber} ثبت شد`;
+        const CSEsmsMessage = `سفارش جناب ${this.state.fullName} با شماره ${testSmsOrderNumber} ثبت شد `;
+
+        // sendSmsToZarsimCEO(CSEsmsMessage, "09123146451");
+        sendSmsToZarsimCEO(CSEsmsMessage, this.state.SalesExpertMobile);
+        sendSmsToZarsimCEO(smsMessage, this.state.phoneNumber);
 
         this.setState({ showSuccessPopup: true, testSmsOrderNumber });
       }
