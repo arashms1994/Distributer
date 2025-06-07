@@ -8,6 +8,7 @@ import {
   loadReserveInventoryByCode,
 } from "../Crud/GetData";
 import { addOrUpdateItemInOrderableInventory } from "../Crud/AddData";
+import { formatNumberWithComma } from "../utils/formatNumberWithComma";
 
 const webUrl = "https://crm.zarsim.com";
 const listName = "shoping";
@@ -151,7 +152,7 @@ export default class ProductCard extends React.Component<
             IdCode,
             size,
             color,
-            price: Price,
+            price: distributerPrice,
           }),
         }
       );
@@ -240,11 +241,13 @@ export default class ProductCard extends React.Component<
               </div>
             )}
 
-            <p className={styles.codeDescription}>قیمت : {Price} تومان</p>
+            <p className={styles.codeDescription}>
+              قیمت : {formatNumberWithComma(Number(Price))} ریال
+            </p>
             <p className={styles.codeDescription}>
               قیمت برای شما:{" "}
               {distributerPrice !== undefined && distributerPrice !== null
-                ? `${distributerPrice} تومان`
+                ? `${formatNumberWithComma(Number(distributerPrice))} ریال`
                 : "تعریف نشده"}
             </p>
             <p className={styles.codeDescription}>کدکالا: {Code}</p>

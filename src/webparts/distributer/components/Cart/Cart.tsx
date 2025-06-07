@@ -8,6 +8,7 @@ import { getCurrentUser, getCustomerInfoByUserName } from "../Crud/GetData";
 import { postToTaskCRM } from "../Crud/PostToTaskCRM";
 import sendSmsToZarsimCEO from "../utils/sendSms";
 import { hashHistory } from "react-router";
+import { formatNumberWithComma } from "../utils/formatNumberWithComma";
 
 export default class Cart extends Component<any, any> {
   constructor(props: any) {
@@ -26,6 +27,7 @@ export default class Cart extends Component<any, any> {
       expertName: "",
       expertMobile: "",
       userInfo: [],
+      totalPrice: 0,
     };
 
     this.handleDeleteItem = this.handleDeleteItem.bind(this);
@@ -71,10 +73,29 @@ export default class Cart extends Component<any, any> {
     return (currentOrderNumber + 1000).toString();
   }
 
+  handleCountUpdate = (id, newCount) => {
+    this.setState(
+      (prevState) => {
+        const updatedCartItems = prevState.cartItems.map((item) => {
+          if (item.Id === id) {
+            return { ...item, count: newCount };
+          }
+          return item;
+        });
+        return { cartItems: updatedCartItems };
+      },
+      () => {
+        this.calculateTotalPrice(this.state.cartItems);
+      }
+    );
+  };
+
   async componentDidMount() {
     try {
       const cartItems = await this.props.fetchCartItems();
-      this.setState({ cartItems });
+      this.setState({ cartItems }, () => {
+        this.calculateTotalPrice(this.state.cartItems);
+      });
 
       const currentUser = await getCurrentUser();
       const nameId = currentUser.UserId.NameId;
@@ -124,8 +145,23 @@ export default class Cart extends Component<any, any> {
         this.props.updateCartCount();
         return this.props.fetchCartItems();
       })
-      .then((cartItems) => this.setState({ cartItems }))
+      .then((cartItems) =>
+        this.setState({ cartItems }, () => {
+          this.calculateTotalPrice(cartItems);
+        })
+      )
       .catch((err) => this.setState({ message: `خطا در حذف: ${err.message}` }));
+  }
+
+  calculateTotalPrice(cartItems) {
+    let total = 0;
+    cartItems.forEach((item) => {
+      const count = Number(item.count) || 0;
+      const price = Number(item.price) || 0;
+      total += count * price;
+    });
+
+    this.setState({ totalPrice: total });
   }
 
   async handleOrder() {
@@ -230,6 +266,9 @@ export default class Cart extends Component<any, any> {
       this.setState({ errMassage: "خطا در ثبت سفارش" });
     }
   }
+  handleCountChange = () => {
+    this.calculateTotalPrice(this.state.cartItems);
+  };
 
   render() {
     return (
@@ -261,6 +300,8 @@ export default class Cart extends Component<any, any> {
         <CartList
           products={this.state.cartItems}
           onDelete={this.handleDeleteItem}
+          onCountChange={this.handleCountChange} // 👈 اضافه کن
+          onCountUpdate={this.handleCountUpdate}
         />
 
         {this.state.cartItems.length > 0 ? (
@@ -314,6 +355,10 @@ export default class Cart extends Component<any, any> {
             </div>
           </div>
         )}
+
+        <div className={styles.totalPrice}>
+          مجموع کل: {formatNumberWithComma(Number(this.state.totalPrice))} ریال
+        </div>
       </div>
     );
   }
