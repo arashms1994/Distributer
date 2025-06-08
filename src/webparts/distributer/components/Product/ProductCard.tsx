@@ -162,6 +162,7 @@ export default class ProductCard extends React.Component<
         showCounter: true,
         itemId: added.d.ID,
         showMessage: true,
+        initialCount: 1,
       });
 
       if (this.props.updateCartCount) {
@@ -208,52 +209,58 @@ export default class ProductCard extends React.Component<
   };
 
   render() {
-    const { Title, Code, image, Price, distributerPrice, Inventory } =
-      this.props;
-    const { showCounter, itemId, showMessage } = this.state;
+    const { Title, Code, image, Price, distributerPrice } = this.props;
+    const { showCounter, itemId, showMessage, warning, availableInventory } =
+      this.state;
+
+    const productLink = `${window.location.origin}${window.location.pathname}#/product-details/${Code}`;
+    const displayInventory = this.getDisplayInventory();
 
     return (
       <div className={styles.cardContainer}>
+        {/*================= Header with Image =============*/}
         <div className={styles.cardHeader}>
           <a
             className={styles.productCardLink}
-            href={`${window.location.origin}${window.location.pathname}#/product-details/${Code}`}
+            href={productLink}
             rel="noopener noreferrer"
           >
             <img src={image} alt={Title} className={styles.productCardImg} />
           </a>
         </div>
 
+        {/*================= Product Description =================*/}
         <div className={styles.cardDescription}>
           <a
             className={styles.productCardLink}
-            href={`${window.location.origin}${window.location.pathname}#/product-details/${Code}`}
+            href={productLink}
             rel="noopener noreferrer"
           >
             <p className={styles.titleDescription}>{Title}</p>
-
             <p className={styles.codeDescription}>
-              موجودی(متر): {this.getDisplayInventory()}
+              موجودی(متر): {displayInventory}
             </p>
-            {this.state.warning && (
-              <div className={styles.warningMessage}>
-                ⚠️ {this.state.warning}
-              </div>
+
+            {warning && (
+              <div className={styles.warningMessage}>⚠️ {warning}</div>
             )}
 
             <p className={styles.codeDescription}>
               قیمت : {formatNumberWithComma(Number(Price))} ریال
             </p>
+
             <p className={styles.codeDescription}>
               قیمت برای شما:{" "}
               {distributerPrice !== undefined && distributerPrice !== null
                 ? `${formatNumberWithComma(Number(distributerPrice))} ریال`
                 : "تعریف نشده"}
             </p>
+
             <p className={styles.codeDescription}>کدکالا: {Code}</p>
           </a>
         </div>
 
+        {/*================ Counter / Add to Cart ==================*/}
         <div className={styles.counterActions}>
           {showCounter && itemId ? (
             <Counter
@@ -263,8 +270,9 @@ export default class ProductCard extends React.Component<
               Id={itemId}
               onDelete={this.handleCounterDeleted}
               updateCartCount={this.props.updateCartCount}
-              availableInventory={this.state.availableInventory}
-              setWarning={this.setWarning} // 👈 اضافه شود
+              availableInventory={availableInventory}
+              setWarning={this.setWarning}
+              initialCount={this.state.initialCount}
             />
           ) : (
             <button
@@ -277,6 +285,7 @@ export default class ProductCard extends React.Component<
           )}
         </div>
 
+        {/*======= Success Message =============*/}
         {showMessage && (
           <div className={styles.successMessage}>
             <svg
