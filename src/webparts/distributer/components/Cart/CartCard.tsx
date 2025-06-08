@@ -1,6 +1,5 @@
 // CartCard.tsx
 import * as React from "react";
-import { CartItemProps } from "../IDistributerProps";
 import styles from "../Styles/Cart.module.scss";
 import Counter from "../Product/Counter";
 import { formatNumberWithComma } from "../utils/formatNumberWithComma";
@@ -13,6 +12,13 @@ export default class CartCard extends React.Component<any, any> {
     };
   }
 
+  setchangeOrdarableInventory = (displayCount) => {
+    this.setState({
+      changeOrdarableInventory: true,
+      displayCount: displayCount,
+    });
+  };
+
   setWarning = (message: string) => {
     this.setState({ warning: message });
   };
@@ -21,6 +27,7 @@ export default class CartCard extends React.Component<any, any> {
     const { product, onDelete } = this.props;
     const { Title, Code, Id, price } = product;
     const itemId = Id;
+
     return (
       <div className={styles.cardContainer}>
         <div className={styles.cardDescription}>
@@ -47,7 +54,7 @@ export default class CartCard extends React.Component<any, any> {
             Id={Id}
             onDelete={onDelete}
             availableInventory={this.state.availableInventory}
-            setWarning={this.setWarning} // 👈 اضافه شود
+            setWarning={this.setWarning}
             onCountChange={(newCount) => {
               this.props.onCountChange();
               this.props.onCountUpdate(product.Id, newCount);

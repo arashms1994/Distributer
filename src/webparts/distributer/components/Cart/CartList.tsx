@@ -1,6 +1,5 @@
 // CartList.tsx
 import * as React from "react";
-import { CartListProps } from "../IDistributerProps";
 import CartCard from "./CartCard";
 import styles from "../Styles/Cart.module.scss";
 
@@ -15,7 +14,7 @@ export default class CartList extends React.Component<any, any> {
             key={product.Id}
             onDelete={onDelete}
             onCountUpdate={this.props.onCountUpdate}
-            onCountChange={this.props.onCountChange} // 👈 اضافه کن
+            onCountChange={this.props.onCountChange}
           />
         ))}
       </div>

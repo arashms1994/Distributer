@@ -10,6 +10,7 @@ import { postToTaskCRM } from "../Crud/PostToTaskCRM";
 import sendSmsToZarsimCEO from "../utils/sendSms";
 import { hashHistory } from "react-router";
 import { formatNumberWithComma } from "../utils/formatNumberWithComma";
+import { extractQuantity } from "../utils/ExtractQuantity";
 
 export default class Cart extends Component<any, any> {
   constructor(props: any) {
@@ -152,7 +153,9 @@ export default class Cart extends Component<any, any> {
     cartItems.forEach((item) => {
       const count = Number(item.count) || 0;
       const price = Number(item.price) || 0;
-      total += count * price;
+      const quantity = extractQuantity(item.Title);
+
+      total += count * price * quantity;
     });
 
     this.setState({ totalPrice: total });
@@ -228,7 +231,7 @@ export default class Cart extends Component<any, any> {
         const smsMessage = `جناب ${this.state.fullName} سفارش شما با شماره ${testSmsOrderNumber} ثبت شد`;
         const CSEsmsMessage = `سفارش جناب ${this.state.fullName} با شماره ${testSmsOrderNumber} ثبت شد `;
 
-        // sendSmsToZarsimCEO(CSEsmsMessage, "09123146451");
+        sendSmsToZarsimCEO(CSEsmsMessage, "09123146451");
         sendSmsToZarsimCEO(CSEsmsMessage, this.state.SalesExpertMobile);
         sendSmsToZarsimCEO(smsMessage, this.state.phoneNumber);
 
@@ -238,24 +241,10 @@ export default class Cart extends Component<any, any> {
       this.setState({ errMassage: "خطا در ثبت سفارش" });
     }
   }
+
   handleCountChange = () => {
     this.calculateTotalPrice(this.state.cartItems);
   };
-  extractQuantity(text) {
-    const persianNumbers = ["۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹"];
-    persianNumbers.forEach((num, index) => {
-      const regex = new RegExp(num, "g");
-      text = text.replace(regex, index);
-    });
-
-    const match = text.match(/(\d+)\s*(?:متر[یي])/);
-
-    if (match) {
-      return parseInt(match[1], 10);
-    } else {
-      return 1; // پیش‌فرض یک واحد
-    }
-  }
 
   render() {
     return (
@@ -270,7 +259,7 @@ export default class Cart extends Component<any, any> {
         <CartList
           products={this.state.cartItems}
           onDelete={this.handleDeleteItem}
-          onCountChange={this.handleCountChange} // 👈 اضافه کن
+          onCountChange={this.handleCountChange}
           onCountUpdate={this.handleCountUpdate}
         />
 
@@ -288,7 +277,7 @@ export default class Cart extends Component<any, any> {
         {this.state.cartItems.length === 0 && (
           <div className={styles.emptyCartMessage}>سبد خرید شما خالی است.</div>
         )}
-
+        
         {this.state.showSuccessPopup && (
           <div className={styles.orderPopupOverlay}>
             <div className={styles.orderPopupBox}>

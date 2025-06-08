@@ -2,22 +2,31 @@ import * as React from "react";
 import { getDigest } from "../Crud/GetDigest";
 import styles from "../Styles/Counter.module.scss";
 import { addOrUpdateItemInVirtualInventory } from "../Crud/AddData";
+import { extractQuantity } from "../utils/ExtractQuantity";
 
 class Counter extends React.Component<any, any> {
-  private listName = "shoping";
-  private webUrl = "https://crm.zarsim.com";
-
   constructor(props) {
     super(props);
+
+    this.quantity = extractQuantity(props.Title || "");
+
     this.state = {
-      count: 0,
-      displayCount: 0,
-      loading: true,
-      // اضافه شد
+      count: props.initialCount,
+      displayCount: props.initialCount,
+      loading: !props.initialCount,
     };
   }
 
+  quantity = 1;
+
+  private listName = "shoping";
+  private webUrl = "https://crm.zarsim.com";
+
   async componentDidMount() {
+    if (!this.props.initialCount) {
+      this.fetchQuantity();
+    }
+
     this.fetchQuantity();
   }
 
@@ -34,7 +43,8 @@ class Counter extends React.Component<any, any> {
     )
       .then((res) => res.json())
       .then((data) => {
-        const count = Number(data.d.count) || 0;
+        const totalCount = Number(data.d.count) || 0;
+        const count = Math.floor(totalCount / this.quantity);
         this.setState({ count, displayCount: count, loading: false });
         if (this.props.onCountChange) {
           this.props.onCountChange(count);
@@ -79,7 +89,7 @@ class Counter extends React.Component<any, any> {
         },
         body: JSON.stringify({
           __metadata: { type: "SP.Data.ShopingListItem" },
-          count: String(newCount),
+          count: String(newCount * this.quantity),
         }),
       })
         .then(() => {
@@ -128,11 +138,10 @@ class Counter extends React.Component<any, any> {
     if (newCount > maxCount) {
       setWarning("مقدار انتخاب‌شده بیشتر از موجودی قابل سفارش است.");
 
-      // گزینه: میتونی مقدار نمایش رو به maxCount محدود کنی
       this.setState({ displayCount: maxCount });
     } else {
       setWarning("");
-      this.setState({ displayCount: newCount, count: newCount }); // ← بهتره مقدار واقعی را هم نگه‌داری
+      this.setState({ displayCount: newCount, count: newCount });
     }
   };
 
@@ -149,7 +158,7 @@ class Counter extends React.Component<any, any> {
       guid_form: String(guid_form),
       ProductCode: String(ProductCode),
       status: 0,
-      reserveInventory: String(displayCount),
+      reserveInventory: String(displayCount * this.quantity), // ضرب در quantity
       Title: String(Title),
     });
 

@@ -72,7 +72,6 @@ export async function addOrUpdateItemInVirtualInventory(data: {
       );
     }
 
-    // جستجو در لیست با فیلتر
     const filterUrl = `${webUrl}/_api/web/lists/getbytitle('${listName}')/items?$filter=${filterQuery}`;
     const searchResponse = await fetch(filterUrl, {
       headers: { Accept: "application/json;odata=verbose" },
@@ -81,6 +80,7 @@ export async function addOrUpdateItemInVirtualInventory(data: {
     if (searchResponse.ok) {
       console.log("ok!!!!!!!!");
     }
+    
     if (!searchResponse.ok) {
       throw new Error(`Search failed: ${searchResponse.statusText}`);
     }
