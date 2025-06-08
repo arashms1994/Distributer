@@ -15,8 +15,11 @@ export interface CartProps {
   refresh?: boolean;
 }
 
+
+
+
 export interface CartItemProps {
-  product: Product;
+  product: Product[];
   onDelete: (id: number) => void;
   onUpdateItem?: () => void; 
 }

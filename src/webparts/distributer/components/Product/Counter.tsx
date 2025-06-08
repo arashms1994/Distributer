@@ -144,6 +144,7 @@ class Counter extends React.Component<any, any> {
     this.props.onUpdateItem && this.props.onUpdateItem(); // ✅ اضافه شد
 
     const guid_form = localStorage.getItem("userGuid");
+
     await addOrUpdateItemInVirtualInventory({
       guid_form: String(guid_form),
       ProductCode: String(ProductCode),

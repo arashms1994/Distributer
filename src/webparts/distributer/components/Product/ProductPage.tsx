@@ -6,6 +6,7 @@ import {
 } from "../Crud/GetData";
 import styles from "../Styles/ProductPage.module.scss";
 import { Image } from "../IDistributerProps";
+import { formatNumberWithComma } from "../utils/formatNumberWithComma";
 
 export default class ProductPage extends React.Component<any, any> {
   constructor(props) {
@@ -162,20 +163,23 @@ export default class ProductPage extends React.Component<any, any> {
           </p>
 
           <p className={styles.productDetailsP}>
-            قیمت: <span className={styles.productDetailsSPAN}>{Price}</span>
+            قیمت:{" "}
+            <span className={styles.productDetailsSPAN}>
+              {formatNumberWithComma(Number(Price))}
+            </span>
           </p>
 
           <p className={styles.productDetailsP}>
             قیمت برای شما:
             <span className={styles.productDetailsSPAN}>
-              {distributerPrice || (
+              {formatNumberWithComma(Number(distributerPrice)) || (
                 <small className={styles.productDetailsSMALL}>تعریف نشده</small>
               )}
             </span>
           </p>
 
           <p className={styles.productDetailsP}>
-            موجودی:
+            موجودی(متر):
             <span className={styles.productDetailsSPAN}>
               {availableInventory !== "" && availableInventory !== null
                 ? availableInventory

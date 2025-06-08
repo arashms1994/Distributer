@@ -9,6 +9,7 @@ import { getCurrentUser, getCustomerInfoByUserName } from "../Crud/GetData";
 import { postToTaskCRM } from "../Crud/PostToTaskCRM";
 import sendSmsToZarsimCEO from "../utils/sendSms";
 import { hashHistory } from "react-router";
+import { formatNumberWithComma } from "../utils/formatNumberWithComma";
 
 export default class Cart extends Component<any, any> {
   constructor(props: any) {
@@ -27,7 +28,7 @@ export default class Cart extends Component<any, any> {
       expertName: "",
       expertMobile: "",
       userInfo: [],
-      totalAmount: 0,
+      totalPrice: 0,
     };
   }
 
@@ -64,18 +65,30 @@ export default class Cart extends Component<any, any> {
     return (parseInt(String(orderId), 10) + 1000).toString();
   }
 
-  calcaluateTheToatalPrice = () => {
-    const totalAmount = this.state.cartItems.reduce((sum, item) => {
-      const price = Number(item.price);
-      const count = Number(item.count);
-      return sum + price * count;
-    }, 0);
-    this.setState({ totalAmount });
+  handleCountUpdate = (id, newCount) => {
+    this.setState(
+      (prevState) => {
+        const updatedCartItems = prevState.cartItems.map((item) => {
+          if (item.Id === id) {
+            return { ...item, count: newCount };
+          }
+          return item;
+        });
+        return { cartItems: updatedCartItems };
+      },
+      () => {
+        this.calculateTotalPrice(this.state.cartItems);
+      }
+    );
   };
 
   async componentDidMount() {
     try {
       const cartItems = await this.props.fetchCartItems();
+      this.setState({ cartItems }, () => {
+        this.calculateTotalPrice(this.state.cartItems);
+      });
+
       const currentUser = await getCurrentUser();
       const nameId = currentUser.UserId.NameId;
       const customerInfo = await getCustomerInfoByUserName(nameId);
@@ -106,27 +119,46 @@ export default class Cart extends Component<any, any> {
       const webUrl = "https://crm.zarsim.com";
       const listName = "shoping";
 
-      await fetch(
-        `${webUrl}/_api/web/lists/getbytitle('${listName}')/items(${id})`,
-        {
-          method: "POST",
-          headers: {
-            Accept: "application/json;odata=verbose",
-            "X-RequestDigest": digest,
-            "IF-MATCH": "*",
-            "X-HTTP-Method": "DELETE",
-          },
-        }
-      );
+    getDigest()
+      .then((digest) =>
+        fetch(
+          `${webUrl}/_api/web/lists/getbytitle('${listName}')/items(${id})`,
+          {
+            method: "POST",
+            headers: {
+              Accept: "application/json;odata=verbose",
+              "X-RequestDigest": digest,
+              "IF-MATCH": "*",
+              "X-HTTP-Method": "DELETE",
+            },
+          }
+        )
+      )
+      .then(() => {
+        this.setState({ message: "کالای مورد نظر با موفقیت حذف شد" });
+        this.props.updateCartCount();
+        return this.props.fetchCartItems();
+      })
+      .then((cartItems) =>
+        this.setState({ cartItems }, () => {
+          this.calculateTotalPrice(cartItems);
+        })
+      )
+      .catch((err) => this.setState({ message: `خطا در حذف: ${err.message}` }));
+  }
 
-      const cartItems = await this.props.fetchCartItems();
-      this.setState({ cartItems }, this.calcaluateTheToatalPrice);
-    } catch (err) {
-      this.setState({ message: `خطا در حذف: ${err.message}` });
-    }
-  };
+  calculateTotalPrice(cartItems) {
+    let total = 0;
+    cartItems.forEach((item) => {
+      const count = Number(item.count) || 0;
+      const price = Number(item.price) || 0;
+      total += count * price;
+    });
 
-  handleOrder = async () => {
+    this.setState({ totalPrice: total });
+  }
+
+  async handleOrder() {
     try {
       const userGuid = localStorage.getItem("userGuid");
       if (
@@ -205,7 +237,25 @@ export default class Cart extends Component<any, any> {
     } catch (err) {
       this.setState({ errMassage: "خطا در ثبت سفارش" });
     }
+  }
+  handleCountChange = () => {
+    this.calculateTotalPrice(this.state.cartItems);
   };
+  extractQuantity(text) {
+    const persianNumbers = ["۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹"];
+    persianNumbers.forEach((num, index) => {
+      const regex = new RegExp(num, "g");
+      text = text.replace(regex, index);
+    });
+
+    const match = text.match(/(\d+)\s*(?:متر[یي])/);
+
+    if (match) {
+      return parseInt(match[1], 10);
+    } else {
+      return 1; // پیش‌فرض یک واحد
+    }
+  }
 
   render() {
     return (
@@ -220,7 +270,8 @@ export default class Cart extends Component<any, any> {
         <CartList
           products={this.state.cartItems}
           onDelete={this.handleDeleteItem}
-          onUpdateItem={this.calcaluateTheToatalPrice}
+          onCountChange={this.handleCountChange} // 👈 اضافه کن
+          onCountUpdate={this.handleCountUpdate}
         />
 
         {this.state.cartItems.length > 0 && (
@@ -256,6 +307,10 @@ export default class Cart extends Component<any, any> {
             </div>
           </div>
         )}
+
+        <div className={styles.totalPrice}>
+          مجموع کل: {formatNumberWithComma(Number(this.state.totalPrice))} ریال
+        </div>
       </div>
     );
   }
