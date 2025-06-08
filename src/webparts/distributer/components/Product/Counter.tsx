@@ -23,11 +23,13 @@ class Counter extends React.Component<any, any> {
   private webUrl = "https://crm.zarsim.com";
 
   async componentDidMount() {
-    if (!this.props.initialCount) {
+    const { initialCount, onCountChange } = this.props;
+
+    if (initialCount) {
+      if (onCountChange) onCountChange(initialCount);
+    } else {
       this.fetchQuantity();
     }
-
-    this.fetchQuantity();
   }
 
   fetchQuantity = () => {
