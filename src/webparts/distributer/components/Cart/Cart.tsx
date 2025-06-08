@@ -269,6 +269,21 @@ export default class Cart extends Component<any, any> {
   handleCountChange = () => {
     this.calculateTotalPrice(this.state.cartItems);
   };
+  extractQuantity(text) {
+    const persianNumbers = ["۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹"];
+    persianNumbers.forEach((num, index) => {
+      const regex = new RegExp(num, "g");
+      text = text.replace(regex, index);
+    });
+
+    const match = text.match(/(\d+)\s*(?:متر[یي])/);
+
+    if (match) {
+      return parseInt(match[1], 10);
+    } else {
+      return 1; // پیش‌فرض یک واحد
+    }
+  }
 
   render() {
     return (

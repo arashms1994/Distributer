@@ -138,6 +138,7 @@ class Counter extends React.Component<any, any> {
     const { displayCount } = this.state;
     this.updateQuantity(displayCount);
     const guid_form = localStorage.getItem("userGuid");
+
     await addOrUpdateItemInVirtualInventory({
       guid_form: String(guid_form),
       ProductCode: String(ProductCode),
