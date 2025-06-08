@@ -43,10 +43,8 @@ export default class ProductPage extends React.Component<any, any> {
     try {
       const availableInventory = await getInventoryByCode(Code);
       this.setState({ availableInventory });
-      console.log("availableInventory", availableInventory);
 
       const item = await loadItemByCode(Code);
-      console.log("item", item);
       const imageUrl: Image[] = await loadImages();
 
       const extracted = this.extractWireDetails(item.Title || "");

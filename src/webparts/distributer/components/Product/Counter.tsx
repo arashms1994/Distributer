@@ -125,11 +125,10 @@ class Counter extends React.Component<any, any> {
     if (newCount > maxCount) {
       setWarning("مقدار انتخاب‌شده بیشتر از موجودی قابل سفارش است.");
 
-      // گزینه: میتونی مقدار نمایش رو به maxCount محدود کنی
       this.setState({ displayCount: maxCount });
     } else {
       setWarning("");
-      this.setState({ displayCount: newCount, count: newCount }); // ← بهتره مقدار واقعی را هم نگه‌داری
+      this.setState({ displayCount: newCount, count: newCount });
     }
   };
 
