@@ -252,7 +252,6 @@ export default class Cart extends Component<any, any> {
         sendSmsToZarsimCEO(smsMessage, this.state.phoneNumber);
 
         this.setState({
-          // message: "سفارش با موفقیت ثبت شد",
           showSuccessPopup: true,
           testSmsOrderNumber,
           fullName: this.state.fullName,
@@ -321,14 +320,14 @@ export default class Cart extends Component<any, any> {
         ) : (
           <div className={styles.emptyCartMessage}>سبد خرید شما خالی است.</div>
         )}
-        
+
         {this.state.showSuccessPopup && (
           <div className={styles.orderPopupOverlay}>
             <div className={styles.orderPopupBox}>
               <h3 className={styles.orderPopupHeading}>ثبت سفارش موفق</h3>
 
               <p className={styles.orderPopupParaph}>
-                مشتری عزیز، جناب {this.state.fullName}
+                مشتری عزیز، {this.state.fullName}
               </p>
 
               <p className={styles.orderPopupParaph}>

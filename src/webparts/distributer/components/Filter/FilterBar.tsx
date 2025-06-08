@@ -3,7 +3,7 @@ import { Component } from "react";
 import styles from "../Styles/Filter.module.scss";
 import { FilterBarProps, FilterBarState, Product } from "../IDistributerProps";
 
-const SUB_CATEGORIES = ["AV", "AVSS", "T1", "T2", "T3"];
+const SUB_CATEGORIES = ["AVSS", "T1", "T2", "T3"];
 
 class FilterBar extends Component<FilterBarProps, FilterBarState> {
   constructor(props: FilterBarProps) {
@@ -116,6 +116,20 @@ class FilterBar extends Component<FilterBarProps, FilterBarState> {
     return unique;
   };
 
+  clearFilters = () => {
+    this.setState(
+      {
+        size: "",
+        color: "",
+        productgroup: "",
+        subcategory: "",
+      },
+      () => {
+        this.props.onFilterChange(this.state);
+      }
+    );
+  };
+
   render() {
     const availableColors = this.getUniqueOptions("color");
     const availableSizes = this.getUniqueOptions("size");
@@ -168,7 +182,7 @@ class FilterBar extends Component<FilterBarProps, FilterBarState> {
           onChange={this.handleChange}
         >
           <option className={styles.filterOption} value="">
-            زیر شاخه ها
+            گرید
           </option>
           {availableSubCategories.map((sub) => (
             <option className={styles.filterOption} key={sub} value={sub}>
@@ -197,6 +211,14 @@ class FilterBar extends Component<FilterBarProps, FilterBarState> {
             </option>
           ))}
         </select>
+
+        <button
+          type="button"
+          className={styles.clearBtn}
+          onClick={this.clearFilters}
+        >
+          حذف فیلترها
+        </button>
       </div>
     );
   }
