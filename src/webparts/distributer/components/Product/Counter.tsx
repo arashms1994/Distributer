@@ -32,6 +32,23 @@ class Counter extends React.Component<any, any> {
     }
   }
 
+  updateReserveInventory = async (newCount: number) => {
+    const { ProductCode, Title, setchangeOrdarableInventory } = this.props;
+    const guid_form = localStorage.getItem("userGuid");
+
+    await addOrUpdateItemInVirtualInventory({
+      guid_form: String(guid_form),
+      ProductCode: String(ProductCode),
+      status: 0,
+      reserveInventory: String(newCount * this.quantity), // ضرب در تعداد واقعی
+      Title: String(Title),
+    });
+
+    if (typeof setchangeOrdarableInventory === "function") {
+      setchangeOrdarableInventory(newCount);
+    }
+  };
+
   fetchQuantity = () => {
     const { Id } = this.props;
 
@@ -110,22 +127,20 @@ class Counter extends React.Component<any, any> {
 
     if (newCount > maxCount) {
       setWarning("مقدار انتخاب‌شده بیشتر از موجودی قابل سفارش است.");
-
       return;
     }
+
     setWarning("");
     await this.updateQuantity(newCount);
+    await this.updateReserveInventory(newCount);
   };
 
-  decrement = () => {
-    const current = this.state.displayCount;
-    if (current === 1) {
-      this.setState({ displayCount: 0 });
-      this.updateQuantity(0);
-    } else {
-      const newCount = Math.max(0, current - 1);
-      this.updateQuantity(newCount);
-    }
+  decrement = async () => {
+    const { displayCount } = this.state;
+    const newCount = Math.max(0, displayCount - 1);
+
+    await this.updateQuantity(newCount);
+    await this.updateReserveInventory(newCount);
   };
 
   handleInputChange = (e) => {
@@ -145,19 +160,10 @@ class Counter extends React.Component<any, any> {
   };
 
   handleInputBlur = async () => {
-    const { ProductCode, Title, setchangeOrdarableInventory } = this.props;
     const { displayCount } = this.state;
-    this.updateQuantity(displayCount);
-    const guid_form = localStorage.getItem("userGuid");
 
-    await addOrUpdateItemInVirtualInventory({
-      guid_form: String(guid_form),
-      ProductCode: String(ProductCode),
-      status: 0,
-      reserveInventory: String(displayCount * this.quantity), // ضرب در quantity
-      Title: String(Title),
-    });
-    setchangeOrdarableInventory(displayCount);
+    await this.updateQuantity(displayCount);
+    await this.updateReserveInventory(displayCount);
   };
 
   render() {
