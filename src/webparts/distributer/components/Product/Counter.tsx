@@ -11,8 +11,8 @@ class Counter extends React.Component<any, any> {
     this.quantity = extractQuantity(props.Title || "");
 
     this.state = {
-      count: props.initialCount || 0,
-      displayCount: props.initialCount || 0,
+      count: props.initialCount,
+      displayCount: props.initialCount,
       loading: !props.initialCount,
     };
   }
