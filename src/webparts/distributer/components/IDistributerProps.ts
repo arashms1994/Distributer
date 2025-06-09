@@ -50,6 +50,7 @@ export interface CardListProps {
 
 export interface Product {
   Price: string;
+  distributerPrice:string
   codegoods: string;
   size: string;
   color: string;

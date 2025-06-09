@@ -27,6 +27,7 @@ export default class Cart extends Component<any, any> {
       expertAcc: "",
       expertName: "",
       expertMobile: "",
+      customerCode: "",
       userInfo: [],
       totalPrice: 0,
     };
@@ -101,8 +102,10 @@ export default class Cart extends Component<any, any> {
       const currentUser = await getCurrentUser();
       const nameId = currentUser.UserId.NameId;
       const customerInfo = await getCustomerInfoByUserName(nameId);
+      console.log(customerInfo);
 
       const fullName = customerInfo.Title || "";
+      const customerCode = customerInfo.CustomerCode || "";
       const phoneNumber = customerInfo.Mobile || "";
       const expertName = customerInfo.SalesExpert || "";
       const expertMobile = customerInfo.SalesExpertMobile || "";
@@ -116,6 +119,7 @@ export default class Cart extends Component<any, any> {
         expertAcc,
         expertName,
         expertMobile,
+        customerCode,
       });
     } catch (err) {
       this.setState({ message: `خطا در بارگذاری سبد خرید: ${err.message}` });
@@ -208,6 +212,7 @@ export default class Cart extends Component<any, any> {
             phoneNumber: this.state.phoneNumber,
             Date: new Date().toISOString(),
             CustomerName: this.state.fullName,
+            CustomerCode: this.state.customerCode,
             OrderNumber: "",
           }),
         }

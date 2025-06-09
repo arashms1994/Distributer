@@ -1,6 +1,7 @@
 import * as React from "react";
 import {
   getCurrentUser,
+  getCustomerInfoByUserName,
   getInventoryByCode,
   loadImages,
   loadItemByCode,
@@ -44,12 +45,14 @@ export default class ProductPage extends React.Component<any, any> {
 
     try {
       const currentUser = await getCurrentUser();
-      const nameId = currentUser.UserId.NameId.toUpperCase();
+      const nameId = currentUser.UserId.NameId;
+      const user = await getCustomerInfoByUserName(nameId);
+      const userName = user.UserName;
       const availableInventory = await getInventoryByCode(Code);
       const item = await loadItemByCode(Code);
       const imageUrl: Image[] = await loadImages();
       const extracted = this.extractWireDetails(item.Title || "");
-      const distributerPrice = item[nameId];
+      const distributerPrice = item[userName];
 
       this.setState({
         imageUrl,
