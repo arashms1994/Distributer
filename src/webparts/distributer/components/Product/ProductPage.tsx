@@ -1,11 +1,13 @@
 import * as React from "react";
 import {
+  getCurrentUser,
   getInventoryByCode,
   loadImages,
   loadItemByCode,
 } from "../Crud/GetData";
 import styles from "../Styles/ProductPage.module.scss";
 import { Image } from "../IDistributerProps";
+import { formatNumberWithComma } from "../utils/formatNumberWithComma";
 
 export default class ProductPage extends React.Component<any, any> {
   constructor(props) {
@@ -16,24 +18,50 @@ export default class ProductPage extends React.Component<any, any> {
       error: "",
       imageUrl: undefined,
       availableInventory: "",
+      distributerPrice: null,
+    };
+  }
+
+  async extractWireDetails(title: string) {
+    const regex = /(\d+(\.\d+)?)\s*\*\s*(\d+)/;
+    const match = title.match(regex);
+
+    if (match) {
+      return {
+        ghotreshte: match[1],
+        number_x002f_stringdiameter: match[3],
+      };
+    }
+
+    return {
+      ghotreshte: null,
+      number_x002f_stringdiameter: null,
     };
   }
 
   async componentDidMount() {
     const { Code } = this.props.params;
-    const availableInventory = await getInventoryByCode(Code);
-    this.setState({ availableInventory });
-
-    console.log("availableInventory", availableInventory);
-
 
     try {
+      const currentUser = await getCurrentUser();
+      const nameId = currentUser.UserId.NameId;
+      const availableInventory = await getInventoryByCode(Code);
       const item = await loadItemByCode(Code);
-      console.log(item);
       const imageUrl: Image[] = await loadImages();
+      const extracted = this.extractWireDetails(item.Title || "");
+      const distributerPrice = item[nameId];
+
       this.setState({
         imageUrl,
-        item,
+        distributerPrice,
+        availableInventory,
+        item: {
+          ...item,
+          ghotreshte: item.ghotreshte || (await extracted).ghotreshte,
+          number_x002f_stringdiameter:
+            item.number_x002f_stringdiameter ||
+            (await extracted).number_x002f_stringdiameter,
+        },
         loading: false,
       });
     } catch (err) {
@@ -42,7 +70,14 @@ export default class ProductPage extends React.Component<any, any> {
   }
 
   render() {
-    const { item, loading, error, imageUrl, availableInventory } = this.state;
+    const {
+      item,
+      loading,
+      error,
+      imageUrl,
+      availableInventory,
+      distributerPrice,
+    } = this.state;
 
     if (loading) return <p>در حال بارگذاری...</p>;
     if (error) return <p>خطا :{error}</p>;
@@ -60,7 +95,6 @@ export default class ProductPage extends React.Component<any, any> {
       IdCode,
       Inventory,
       Price,
-      distributerPrice,
     } = item;
 
     let modifiedThermalClass = thermalclass;
@@ -137,16 +171,14 @@ export default class ProductPage extends React.Component<any, any> {
           </p>
 
           <p className={styles.productDetailsP}>
-            قیمت: <span className={styles.productDetailsSPAN}>{Price}</span>
+            قیمت: {formatNumberWithComma(Number(Price))} ریال
           </p>
 
           <p className={styles.productDetailsP}>
-            قیمت برای شما:
-            <span className={styles.productDetailsSPAN}>
-              {distributerPrice || (
-                <small className={styles.productDetailsSMALL}>تعریف نشده</small>
-              )}
-            </span>
+            قیمت برای شما:{" "}
+            {distributerPrice !== undefined && distributerPrice !== null
+              ? `${formatNumberWithComma(Number(distributerPrice))} ریال`
+              : "تعریف نشده"}
           </p>
 
           <p className={styles.productDetailsP}>

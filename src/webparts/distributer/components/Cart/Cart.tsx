@@ -8,6 +8,8 @@ import { getCurrentUser, getCustomerInfoByUserName } from "../Crud/GetData";
 import { postToTaskCRM } from "../Crud/PostToTaskCRM";
 import sendSmsToZarsimCEO from "../utils/sendSms";
 import { hashHistory } from "react-router";
+import { formatNumberWithComma } from "../utils/formatNumberWithComma";
+import { extractQuantity } from "../utils/ExtractQuantity";
 
 export default class Cart extends Component<any, any> {
   constructor(props: any) {
@@ -22,7 +24,11 @@ export default class Cart extends Component<any, any> {
       nameId: "",
       orderCountToday: 1,
       phoneNumber: "",
+      expertAcc: "",
+      expertName: "",
+      expertMobile: "",
       userInfo: [],
+      totalPrice: 0,
     };
 
     this.handleDeleteItem = this.handleDeleteItem.bind(this);
@@ -67,27 +73,50 @@ export default class Cart extends Component<any, any> {
     const currentOrderNumber = parseInt(String(orderId), 10);
     return (currentOrderNumber + 1000).toString();
   }
-  handleCountChange = (id: number, newCount: number) => {
-    // این تابع هر بار که شمارنده تغییر کند اجرا می‌شود
-    console.log("Updated count for item", id, ":", newCount);
-    this.props.addOrUpdateItemInVirtualInventory(id, newCount);
+
+  handleCountUpdate = (id, newCount) => {
+    this.setState(
+      (prevState) => {
+        const updatedCartItems = prevState.cartItems.map((item) => {
+          if (item.Id === id) {
+            return { ...item, count: newCount };
+          }
+          return item;
+        });
+        return { cartItems: updatedCartItems };
+      },
+      () => {
+        this.calculateTotalPrice(this.state.cartItems);
+      }
+    );
   };
 
   async componentDidMount() {
     try {
       const cartItems = await this.props.fetchCartItems();
-      this.setState({ cartItems });
+      this.setState({ cartItems }, () => {
+        this.calculateTotalPrice(this.state.cartItems);
+      });
 
       const currentUser = await getCurrentUser();
       const nameId = currentUser.UserId.NameId;
-
       const customerInfo = await getCustomerInfoByUserName(nameId);
+
       const fullName = customerInfo.Title || "";
       const phoneNumber = customerInfo.Mobile || "";
+      const expertName = customerInfo.SalesExpert || "";
+      const expertMobile = customerInfo.SalesExpertMobile || "";
+      const expertAcc_text = customerInfo.SalesExpertAcunt_text || "";
+      const expertAcc = expertAcc_text.split("\\")[1];
 
-      console.log("phone:", phoneNumber, "user:", fullName);
-
-      this.setState({ nameId, fullName, phoneNumber });
+      this.setState({
+        nameId,
+        fullName,
+        phoneNumber,
+        expertAcc,
+        expertName,
+        expertMobile,
+      });
     } catch (err) {
       this.setState({ message: `خطا در بارگذاری سبد خرید: ${err.message}` });
     }
@@ -117,8 +146,25 @@ export default class Cart extends Component<any, any> {
         this.props.updateCartCount();
         return this.props.fetchCartItems();
       })
-      .then((cartItems) => this.setState({ cartItems }))
+      .then((cartItems) =>
+        this.setState({ cartItems }, () => {
+          this.calculateTotalPrice(cartItems);
+        })
+      )
       .catch((err) => this.setState({ message: `خطا در حذف: ${err.message}` }));
+  }
+
+  calculateTotalPrice(cartItems) {
+    let total = 0;
+    cartItems.forEach((item) => {
+      const count = Number(item.count) || 0;
+      const price = Number(item.price) || 0;
+      const quantity = extractQuantity(item.Title);
+
+      total += count * price * quantity;
+    });
+
+    this.setState({ totalPrice: total });
   }
 
   async handleOrder() {
@@ -191,17 +237,21 @@ export default class Cart extends Component<any, any> {
           }
         );
 
-        postToTaskCRM(String(testSmsOrderNumber), this.state.fullName);
+        postToTaskCRM(
+          String(testSmsOrderNumber),
+          this.state.fullName,
+          String(this.state.expertAcc),
+          String(this.state.expertName)
+        );
 
         const smsMessage = `جناب ${this.state.fullName} سفارش شما با شماره ${testSmsOrderNumber} ثبت شد`;
         const CSEsmsMessage = `سفارش جناب ${this.state.fullName} با شماره ${testSmsOrderNumber} ثبت شد `;
 
-        // sendSmsToZarsimCEO(CSEsmsMessage, "09129643050");
-        // sendSmsToZarsimCEO(CSEsmsMessage, "09123146451");
+        sendSmsToZarsimCEO(CSEsmsMessage, "09123146451");
+        sendSmsToZarsimCEO(CSEsmsMessage, this.state.SalesExpertMobile);
         sendSmsToZarsimCEO(smsMessage, this.state.phoneNumber);
 
         this.setState({
-          // message: "سفارش با موفقیت ثبت شد",
           showSuccessPopup: true,
           testSmsOrderNumber,
           fullName: this.state.fullName,
@@ -218,6 +268,10 @@ export default class Cart extends Component<any, any> {
       this.setState({ errMassage: "خطا در ثبت سفارش" });
     }
   }
+
+  handleCountChange = () => {
+    this.calculateTotalPrice(this.state.cartItems);
+  };
 
   render() {
     return (
@@ -250,6 +304,7 @@ export default class Cart extends Component<any, any> {
           products={this.state.cartItems}
           onDelete={this.handleDeleteItem}
           onCountChange={this.handleCountChange}
+          onCountUpdate={this.handleCountUpdate}
         />
 
         {this.state.cartItems.length > 0 ? (
@@ -265,13 +320,14 @@ export default class Cart extends Component<any, any> {
         ) : (
           <div className={styles.emptyCartMessage}>سبد خرید شما خالی است.</div>
         )}
+
         {this.state.showSuccessPopup && (
           <div className={styles.orderPopupOverlay}>
             <div className={styles.orderPopupBox}>
               <h3 className={styles.orderPopupHeading}>ثبت سفارش موفق</h3>
 
               <p className={styles.orderPopupParaph}>
-                مشتری عزیز، جناب {this.state.fullName}
+                مشتری عزیز، {this.state.fullName}
               </p>
 
               <p className={styles.orderPopupParaph}>
@@ -303,6 +359,10 @@ export default class Cart extends Component<any, any> {
             </div>
           </div>
         )}
+
+        <div className={styles.totalPrice}>
+          مجموع کل: {formatNumberWithComma(Number(this.state.totalPrice))} ریال
+        </div>
       </div>
     );
   }

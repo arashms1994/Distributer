@@ -38,10 +38,16 @@ export async function loadItemByCode(code: string) {
     }
 
     const data = await response.json();
+
+    if (data.d.results.length === 0) {
+      console.warn(`محصولی با کد ${code} یافت نشد.`);
+      return null; // یا {}
+    }
+
     return data.d.results[0];
   } catch (err) {
     console.error("خطا در دریافت آیتم:", err);
-    throw err;
+    return null; // بهتر از throw در اینجا
   }
 }
 
@@ -187,12 +193,37 @@ export async function getInventoryByCode(code: string) {
     );
 
     const data = await response.json();
-    console.log("Available Inventory:", data.d.results);
-    const objData=data.d.results.at(0);
-    const result=objData.orderableInventory;
+
+    const objData = data.d.results.at(0);
+    const result = objData.orderableInventory;
     return result;
   } catch (error) {
     console.error("Error fetching inventory:", error);
     return [];
+  }
+}
+
+export async function loadReserveInventoryByCode(code: string) {
+  const webUrl = "https://crm.zarsim.com";
+  const listName = "virtualInventory";
+  const encodedCode = encodeURIComponent(code);
+
+  try {
+    const response = await fetch(
+      `${webUrl}/_api/web/lists/getbytitle('${listName}')/items?$filter=ProductCode eq '${encodedCode}'`,
+      {
+        headers: { Accept: "application/json;odata=verbose" },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("دریافت اطلاعات محصول با خطا مواجه شد");
+    }
+
+    const data = await response.json();
+    return data.d.results;
+  } catch (err) {
+    console.error("خطا در دریافت آیتم:", err);
+    throw err;
   }
 }

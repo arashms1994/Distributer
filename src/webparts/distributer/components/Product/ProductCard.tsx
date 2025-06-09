@@ -2,14 +2,15 @@ import * as React from "react";
 import { Product } from "../IDistributerProps";
 import Counter from "./Counter";
 import styles from "../Styles/Product.module.scss";
-import { getInventoryByCode } from "../Crud/GetData";
+import { loadItemByCode, loadReserveInventoryByCode } from "../Crud/GetData";
+import { formatNumberWithComma } from "../utils/formatNumberWithComma";
 
 const webUrl = "https://crm.zarsim.com";
 const listName = "shoping";
 const itemType = "SP.Data.ShopingListItem";
 
 export default class ProductCard extends React.Component<
-  Product & { distributerPrice: any },
+  Product & { nameId?: string; updateCartCount?: () => void },
   any
 > {
   constructor(props) {
@@ -19,18 +20,43 @@ export default class ProductCard extends React.Component<
       itemId: null,
       showMessage: false,
       availableInventory: "",
+      changeOrdarableInventory: false,
+      displayCount: "",
+      warning: "",
+      distributerPrice: null,
     };
   }
 
   async componentDidMount() {
-    const { Code } = this.props;
-    const availableInventory = await getInventoryByCode(Code);
+    const { Code, nameId } = this.props;
 
-    this.setState({ availableInventory });
-    console.log("availableInventory:", availableInventory);
-
-    const userGuid = localStorage.getItem("userGuid");
     try {
+      const ItemStore = await loadItemByCode(Code);
+      if (!ItemStore || typeof ItemStore.Inventory === "undefined") {
+        console.warn("کالا با این کد پیدا نشد یا موجودی تعریف نشده است:", Code);
+        return;
+      }
+
+      const actualInventory = ItemStore.Inventory;
+
+      const reserveItems = await loadReserveInventoryByCode(Code);
+      const totalReserveInventory = reserveItems.reduce(
+        (sum, item) => sum + (Number(item.reserveInventory) || 0),
+        0
+      );
+
+      const updatedInventory = Number(actualInventory - totalReserveInventory);
+
+      const priceColumn = nameId;
+      const distributerPrice = ItemStore[priceColumn];
+
+      this.setState({
+        changeOrdarableInventory: false,
+        availableInventory: updatedInventory,
+        distributerPrice: distributerPrice,
+      });
+
+      const userGuid = localStorage.getItem("userGuid");
       const checkRes = await fetch(
         `${webUrl}/_api/web/lists/getbytitle('${listName}')/items?$filter=guid_form eq '${userGuid}' and codegoods eq '${Code}'`,
         {
@@ -46,13 +72,46 @@ export default class ProductCard extends React.Component<
         });
       }
     } catch (err) {
-      console.error("خطا در بررسی سبد خرید:", err);
+      console.error("خطا در componentDidMount ProductCard:", err);
     }
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      prevState.changeOrdarableInventory !==
+        this.state.changeOrdarableInventory &&
+      this.state.changeOrdarableInventory === true
+    ) {
+      this.handleChangeOrderableInventory();
+    }
+  }
+
+  async handleChangeOrderableInventory() {
+    const { Code } = this.props;
+
+    const ItemStore = await loadItemByCode(Code);
+    const actualInventory = ItemStore.Inventory;
+
+    const toatalReserveInventoryByProductCode =
+      await loadReserveInventoryByCode(Code);
+    const totalReserveInventory = toatalReserveInventoryByProductCode.reduce(
+      (sum, item) => {
+        return sum + (Number(item.reserveInventory) || 0);
+      },
+      0
+    );
+
+    const updatedInventory = Number(actualInventory - totalReserveInventory);
+
+    this.setState({
+      changeOrdarableInventory: false,
+      availableInventory: updatedInventory,
+    });
+  }
+
   handleAddToCart = async () => {
-    const { Title, Code, productgroup, IdCode, size, color, distributerPrice } =
-      this.props;
+    const { Title, Code, productgroup, IdCode, size, color } = this.props;
+    const { distributerPrice } = this.state;
 
     const userGuid = localStorage.getItem("userGuid");
 
@@ -85,6 +144,7 @@ export default class ProductCard extends React.Component<
             IdCode,
             size,
             color,
+            price: distributerPrice,
           }),
         }
       );
@@ -94,10 +154,12 @@ export default class ProductCard extends React.Component<
         showCounter: true,
         itemId: added.d.ID,
         showMessage: true,
+        initialCount: 1,
       });
 
       if (this.props.updateCartCount) {
         this.props.updateCartCount();
+        await this.handleChangeOrderableInventory();
       }
 
       setTimeout(() => {
@@ -127,52 +189,88 @@ export default class ProductCard extends React.Component<
     return Inventory;
   }
 
+  setchangeOrdarableInventory = (displayCount) => {
+    this.setState({
+      changeOrdarableInventory: true,
+      displayCount: displayCount,
+    });
+  };
+
+  setWarning = (message: string) => {
+    this.setState({ warning: message });
+  };
+
   render() {
-    const { Title, Code, image, Price, distributerPrice, Inventory } =
-      this.props;
-    const { showCounter, itemId, showMessage } = this.state;
+    const { Title, Code, image, Price } = this.props;
+    const {
+      showCounter,
+      itemId,
+      showMessage,
+      warning,
+      availableInventory,
+      distributerPrice,
+    } = this.state;
+
+    const productLink = `${window.location.origin}${window.location.pathname}#/product-details/${Code}`;
+    const displayInventory = this.getDisplayInventory();
 
     return (
       <div className={styles.cardContainer}>
+        {/*================= Header with Image =============*/}
         <div className={styles.cardHeader}>
           <a
             className={styles.productCardLink}
-            href={`${window.location.origin}${window.location.pathname}#/product-details/${Code}`}
+            href={productLink}
             rel="noopener noreferrer"
           >
             <img src={image} alt={Title} className={styles.productCardImg} />
           </a>
         </div>
 
+        {/*================= Product Description =================*/}
         <div className={styles.cardDescription}>
           <a
             className={styles.productCardLink}
-            href={`${window.location.origin}${window.location.pathname}#/product-details/${Code}`}
+            href={productLink}
             rel="noopener noreferrer"
           >
             <p className={styles.titleDescription}>{Title}</p>
-
             <p className={styles.codeDescription}>
-              موجودی(متر): {this.getDisplayInventory()}
+              موجودی(متر): {displayInventory}
             </p>
 
-            <p className={styles.codeDescription}>قیمت : {Price} تومان</p>
+            {warning && (
+              <div className={styles.warningMessage}>⚠️ {warning}</div>
+            )}
+
             <p className={styles.codeDescription}>
-              قیمت برای شما:{" "}
+              قیمت: {formatNumberWithComma(Number(Price))} ریال
+            </p>
+
+            <p className={styles.codeDescription}>
+              قیمت برای شما: {" "}
               {distributerPrice !== undefined && distributerPrice !== null
-                ? `${distributerPrice} تومان`
+                ? `${formatNumberWithComma(Number(distributerPrice))} ریال`
                 : "تعریف نشده"}
             </p>
+
             <p className={styles.codeDescription}>کدکالا: {Code}</p>
           </a>
         </div>
 
+        {/*================ Counter / Add to Cart ==================*/}
         <div className={styles.counterActions}>
           {showCounter && itemId ? (
             <Counter
+              setchangeOrdarableInventory={this.setchangeOrdarableInventory}
+              Title={Title}
+              ProductCode={Code}
               Id={itemId}
               onDelete={this.handleCounterDeleted}
               updateCartCount={this.props.updateCartCount}
+              availableInventory={availableInventory}
+              setWarning={this.setWarning}
+              initialCount={this.state.initialCount}
             />
           ) : (
             <button
@@ -185,6 +283,7 @@ export default class ProductCard extends React.Component<
           )}
         </div>
 
+        {/*======= Success Message =============*/}
         {showMessage && (
           <div className={styles.successMessage}>
             <svg

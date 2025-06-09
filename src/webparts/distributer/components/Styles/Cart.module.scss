@@ -301,3 +301,21 @@
     color: white;
   }
 }
+
+.warningMessage {
+  color: #d9534f;
+  font-size: 0.9rem;
+  margin-top: 4px;
+  font-weight: bold;
+}
+
+.totalPrice {
+  padding: 10px 12px;
+  border-radius: 3.5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bolder;
+  font-size: larger;
+  background-color: white;
+}

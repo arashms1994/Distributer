@@ -152,8 +152,6 @@ export default class OrderForm extends Component<any, any> {
           showMessage: false,
         });
 
-        postToTaskCRM(String(this.state.testSmsOrderNumber), fullName);
-
         const smsMessage = `جناب آقای ${fullName}  سفارش شما با شماره ${testSmsOrderNumber} ثبت شد`;
 
         await fetch(
