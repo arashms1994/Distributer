@@ -1,5 +1,6 @@
 import * as React from "react";
 import {
+  getCurrentUser,
   getInventoryByCode,
   loadImages,
   loadItemByCode,
@@ -17,6 +18,7 @@ export default class ProductPage extends React.Component<any, any> {
       error: "",
       imageUrl: undefined,
       availableInventory: "",
+      distributerPrice: null,
     };
   }
 
@@ -41,16 +43,18 @@ export default class ProductPage extends React.Component<any, any> {
     const { Code } = this.props.params;
 
     try {
+      const currentUser = await getCurrentUser();
+      const nameId = currentUser.UserId.NameId;
       const availableInventory = await getInventoryByCode(Code);
-      this.setState({ availableInventory });
-
       const item = await loadItemByCode(Code);
       const imageUrl: Image[] = await loadImages();
-
       const extracted = this.extractWireDetails(item.Title || "");
+      const distributerPrice = item[nameId];
 
       this.setState({
         imageUrl,
+        distributerPrice,
+        availableInventory,
         item: {
           ...item,
           ghotreshte: item.ghotreshte || (await extracted).ghotreshte,
@@ -66,7 +70,14 @@ export default class ProductPage extends React.Component<any, any> {
   }
 
   render() {
-    const { item, loading, error, imageUrl, availableInventory } = this.state;
+    const {
+      item,
+      loading,
+      error,
+      imageUrl,
+      availableInventory,
+      distributerPrice,
+    } = this.state;
 
     if (loading) return <p>در حال بارگذاری...</p>;
     if (error) return <p>خطا :{error}</p>;
@@ -84,7 +95,6 @@ export default class ProductPage extends React.Component<any, any> {
       IdCode,
       Inventory,
       Price,
-      distributerPrice,
     } = item;
 
     let modifiedThermalClass = thermalclass;
@@ -170,14 +180,16 @@ export default class ProductPage extends React.Component<any, any> {
           <p className={styles.productDetailsP}>
             قیمت برای شما:
             <span className={styles.productDetailsSPAN}>
-              {formatNumberWithComma(Number(distributerPrice)) || (
+              {distributerPrice !== undefined && distributerPrice !== null ? (
+                formatNumberWithComma(Number(distributerPrice))
+              ) : (
                 <small className={styles.productDetailsSMALL}>تعریف نشده</small>
               )}
             </span>
           </p>
 
           <p className={styles.productDetailsP}>
-            موجودی(متر):
+            موجودی:
             <span className={styles.productDetailsSPAN}>
               {availableInventory !== "" && availableInventory !== null
                 ? availableInventory
