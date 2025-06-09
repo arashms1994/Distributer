@@ -171,21 +171,14 @@ export default class ProductPage extends React.Component<any, any> {
           </p>
 
           <p className={styles.productDetailsP}>
-            قیمت:{" "}
-            <span className={styles.productDetailsSPAN}>
-              {formatNumberWithComma(Number(Price))}
-            </span>
+            قیمت: {formatNumberWithComma(Number(Price))} ریال
           </p>
 
           <p className={styles.productDetailsP}>
-            قیمت برای شما:
-            <span className={styles.productDetailsSPAN}>
-              {distributerPrice !== undefined && distributerPrice !== null ? (
-                formatNumberWithComma(Number(distributerPrice))
-              ) : (
-                <small className={styles.productDetailsSMALL}>تعریف نشده</small>
-              )}
-            </span>
+            قیمت برای شما:{" "}
+            {distributerPrice !== undefined && distributerPrice !== null
+              ? `${formatNumberWithComma(Number(distributerPrice))} ریال`
+              : "تعریف نشده"}
           </p>
 
           <p className={styles.productDetailsP}>
