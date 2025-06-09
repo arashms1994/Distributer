@@ -28,7 +28,7 @@ export default class ProductCard extends React.Component<
   }
 
   async componentDidMount() {
-    const { Code, nameId } = this.props;
+    const { Code, distributerPrice } = this.props;
 
     try {
       const ItemStore = await loadItemByCode(Code);
@@ -46,9 +46,6 @@ export default class ProductCard extends React.Component<
       );
 
       const updatedInventory = Number(actualInventory - totalReserveInventory);
-
-      const priceColumn = nameId.toUpperCase();
-      const distributerPrice = ItemStore[priceColumn];
 
       this.setState({
         changeOrdarableInventory: false,
@@ -111,7 +108,7 @@ export default class ProductCard extends React.Component<
 
   handleAddToCart = async () => {
     const { Title, Code, productgroup, IdCode, size, color } = this.props;
-    const { distributerPrice } = this.state;
+    const { distributerPrice } = this.props;
 
     const userGuid = localStorage.getItem("userGuid");
 
@@ -201,14 +198,13 @@ export default class ProductCard extends React.Component<
   };
 
   render() {
-    const { Title, Code, image, Price } = this.props;
+    const { Title, Code, image, Price, distributerPrice } = this.props;
     const {
       showCounter,
       itemId,
       showMessage,
       warning,
       availableInventory,
-      distributerPrice,
     } = this.state;
 
     const productLink = `${window.location.origin}${window.location.pathname}#/product-details/${Code}`;

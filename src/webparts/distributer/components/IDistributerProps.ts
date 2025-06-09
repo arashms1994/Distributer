@@ -15,9 +15,6 @@ export interface CartProps {
   refresh?: boolean;
 }
 
-
-
-
 export interface CartItemProps {
   product: Product[];
   onDelete: (id: number) => void;
@@ -53,6 +50,7 @@ export interface CardListProps {
 
 export interface Product {
   Price: string;
+  distributerPrice:string
   codegoods: string;
   size: string;
   color: string;
@@ -73,7 +71,7 @@ export interface ProductsDivProps {
   cart: (id: number, title: string) => void;
   image: any;
   updateCartCount?: () => void;
-  nameId: string;
+  userName: string;
 }
 
 export interface CounterProps {

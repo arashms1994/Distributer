@@ -77,10 +77,6 @@ export async function addOrUpdateItemInVirtualInventory(data: {
       headers: { Accept: "application/json;odata=verbose" },
     });
 
-    if (searchResponse.ok) {
-      console.log("ok!!!!!!!!");
-    }
-    
     if (!searchResponse.ok) {
       throw new Error(`Search failed: ${searchResponse.statusText}`);
     }
