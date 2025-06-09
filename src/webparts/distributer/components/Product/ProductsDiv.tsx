@@ -8,13 +8,12 @@ export default class ProductsDiv extends React.Component<
   any
 > {
   render() {
-    const { products, cart, image, nameId } = this.props;
+    const { products, cart, image, nameId, updateCartCount } = this.props;
 
     return (
       <div className={styles.productsDiv}>
         {products.map((p, i) => {
           const distributerPrice = p[nameId];
-
           const matchedImage = image.find(
             (img) => img.name === `${p.IdCode}.jpg`
           );
@@ -22,7 +21,7 @@ export default class ProductsDiv extends React.Component<
           return (
             <ProductCard
               Price={p.Price}
-              nameId={this.props.nameId}
+              nameId={distributerPrice}
               Inventory={p.Inventory}
               codegoods={p.codegoods}
               size={p.size}
@@ -40,7 +39,7 @@ export default class ProductsDiv extends React.Component<
                   ? `https://crm.zarsim.com${matchedImage.url}`
                   : undefined
               }
-              updateCartCount={this.props.updateCartCount}
+              updateCartCount={updateCartCount}
             />
           );
         })}

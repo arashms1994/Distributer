@@ -43,7 +43,8 @@ export default class Distributer extends Component<IDistributerProps, any> {
     const items = await loadItems();
     const imageUrl = await loadImages();
     const currentUser = await getCurrentUser();
-    const nameId = currentUser.UserId.NameId;
+    const nameId = currentUser.UserId.NameId.toUpperCase();
+    console.log(nameId)
 
     let userGuid = localStorage.getItem("userGuid");
     if (!userGuid) {
