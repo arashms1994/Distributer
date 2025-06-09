@@ -131,7 +131,9 @@ export default class Distributer extends Component<IDistributerProps, any> {
 
     if (searchQuery.trim() !== "") {
       filteredItems = filteredItems.filter(
-        (item: Product) => item.Title && containsText(item.Title, searchQuery)
+        (item: Product) =>
+          (item.Title && containsText(item.Title, searchQuery)) ||
+          (item.Code && containsText(item.Code, searchQuery))
       );
     }
 
