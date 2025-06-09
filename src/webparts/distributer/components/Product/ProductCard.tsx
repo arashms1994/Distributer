@@ -2,12 +2,7 @@ import * as React from "react";
 import { Product } from "../IDistributerProps";
 import Counter from "./Counter";
 import styles from "../Styles/Product.module.scss";
-import {
-  getInventoryByCode,
-  loadItemByCode,
-  loadReserveInventoryByCode,
-} from "../Crud/GetData";
-import { addOrUpdateItemInOrderableInventory } from "../Crud/AddData";
+import { loadItemByCode, loadReserveInventoryByCode } from "../Crud/GetData";
 import { formatNumberWithComma } from "../utils/formatNumberWithComma";
 
 const webUrl = "https://crm.zarsim.com";
@@ -15,7 +10,7 @@ const listName = "shoping";
 const itemType = "SP.Data.ShopingListItem";
 
 export default class ProductCard extends React.Component<
-  Product & { distributerPrice: any },
+  Product & { nameId?: string; updateCartCount?: () => void },
   any
 > {
   constructor(props) {
@@ -28,11 +23,12 @@ export default class ProductCard extends React.Component<
       changeOrdarableInventory: false,
       displayCount: "",
       warning: "",
+      distributerPrice: null,
     };
   }
 
   async componentDidMount() {
-    const { Code } = this.props;
+    const { Code, nameId } = this.props;
 
     try {
       const ItemStore = await loadItemByCode(Code);
@@ -51,9 +47,13 @@ export default class ProductCard extends React.Component<
 
       const updatedInventory = Number(actualInventory - totalReserveInventory);
 
+      const priceColumn = nameId;
+      const distributerPrice = ItemStore[priceColumn];
+
       this.setState({
         changeOrdarableInventory: false,
         availableInventory: updatedInventory,
+        distributerPrice: distributerPrice,
       });
 
       const userGuid = localStorage.getItem("userGuid");
@@ -110,16 +110,8 @@ export default class ProductCard extends React.Component<
   }
 
   handleAddToCart = async () => {
-    const {
-      Title,
-      Code,
-      productgroup,
-      IdCode,
-      size,
-      color,
-      distributerPrice,
-      Price,
-    } = this.props;
+    const { Title, Code, productgroup, IdCode, size, color } = this.props;
+    const { distributerPrice } = this.state;
 
     const userGuid = localStorage.getItem("userGuid");
 
@@ -209,9 +201,15 @@ export default class ProductCard extends React.Component<
   };
 
   render() {
-    const { Title, Code, image, Price, distributerPrice } = this.props;
-    const { showCounter, itemId, showMessage, warning, availableInventory } =
-      this.state;
+    const { Title, Code, image, Price } = this.props;
+    const {
+      showCounter,
+      itemId,
+      showMessage,
+      warning,
+      availableInventory,
+      distributerPrice,
+    } = this.state;
 
     const productLink = `${window.location.origin}${window.location.pathname}#/product-details/${Code}`;
     const displayInventory = this.getDisplayInventory();
@@ -246,11 +244,11 @@ export default class ProductCard extends React.Component<
             )}
 
             <p className={styles.codeDescription}>
-              قیمت : {formatNumberWithComma(Number(Price))} ریال
+              قیمت: {formatNumberWithComma(Number(Price))} ریال
             </p>
 
             <p className={styles.codeDescription}>
-              قیمت برای شما:{" "}
+              قیمت برای شما: {" "}
               {distributerPrice !== undefined && distributerPrice !== null
                 ? `${formatNumberWithComma(Number(distributerPrice))} ریال`
                 : "تعریف نشده"}

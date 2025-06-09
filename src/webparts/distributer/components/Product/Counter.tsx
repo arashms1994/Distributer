@@ -23,12 +23,31 @@ class Counter extends React.Component<any, any> {
   private webUrl = "https://crm.zarsim.com";
 
   async componentDidMount() {
-    if (!this.props.initialCount) {
+    const { initialCount, onCountChange } = this.props;
+
+    if (initialCount) {
+      if (onCountChange) onCountChange(initialCount);
+    } else {
       this.fetchQuantity();
     }
-
-    this.fetchQuantity();
   }
+
+  updateReserveInventory = async (newCount: number) => {
+    const { ProductCode, Title, setchangeOrdarableInventory } = this.props;
+    const guid_form = localStorage.getItem("userGuid");
+
+    await addOrUpdateItemInVirtualInventory({
+      guid_form: String(guid_form),
+      ProductCode: String(ProductCode),
+      status: 0,
+      reserveInventory: String(newCount * this.quantity), // ضرب در تعداد واقعی
+      Title: String(Title),
+    });
+
+    if (typeof setchangeOrdarableInventory === "function") {
+      setchangeOrdarableInventory(newCount);
+    }
+  };
 
   fetchQuantity = () => {
     const { Id } = this.props;
@@ -113,20 +132,15 @@ class Counter extends React.Component<any, any> {
 
     setWarning("");
     await this.updateQuantity(newCount);
-    this.props.onUpdateItem && this.props.onUpdateItem(); // ✅ اضافه شد
+    await this.updateReserveInventory(newCount);
   };
 
-  decrement = () => {
-    const current = this.state.displayCount;
-    if (current === 1) {
-      this.setState({ displayCount: 0 });
-      this.updateQuantity(0);
-      this.props.onUpdateItem && this.props.onUpdateItem(); // ✅ اضافه شد
-    } else {
-      const newCount = Math.max(0, current - 1);
-      this.updateQuantity(newCount);
-      this.props.onUpdateItem && this.props.onUpdateItem(); // ✅ اضافه شد
-    }
+  decrement = async () => {
+    const { displayCount } = this.state;
+    const newCount = Math.max(0, displayCount - 1);
+
+    await this.updateQuantity(newCount);
+    await this.updateReserveInventory(newCount);
   };
 
   handleInputChange = (e) => {
@@ -146,23 +160,10 @@ class Counter extends React.Component<any, any> {
   };
 
   handleInputBlur = async () => {
-    const { ProductCode, Title, setchangeOrdarableInventory } = this.props;
     const { displayCount } = this.state;
 
     await this.updateQuantity(displayCount);
-    this.props.onUpdateItem && this.props.onUpdateItem(); // ✅ اضافه شد
-
-    const guid_form = localStorage.getItem("userGuid");
-
-    await addOrUpdateItemInVirtualInventory({
-      guid_form: String(guid_form),
-      ProductCode: String(ProductCode),
-      status: 0,
-      reserveInventory: String(displayCount * this.quantity), // ضرب در quantity
-      Title: String(Title),
-    });
-
-    setchangeOrdarableInventory(displayCount);
+    await this.updateReserveInventory(displayCount);
   };
 
   render() {

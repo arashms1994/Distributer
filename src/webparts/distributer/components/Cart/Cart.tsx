@@ -235,7 +235,17 @@ export default class Cart extends Component<any, any> {
         sendSmsToZarsimCEO(CSEsmsMessage, this.state.SalesExpertMobile);
         sendSmsToZarsimCEO(smsMessage, this.state.phoneNumber);
 
-        this.setState({ showSuccessPopup: true, testSmsOrderNumber });
+        this.setState({
+          showSuccessPopup: true,
+          testSmsOrderNumber,
+          fullName: this.state.fullName,
+        });
+
+        setTimeout(() => {
+          localStorage.removeItem("userGuid");
+        }, 2000);
+      } else {
+        this.setState({ errMassage: "خطا در ثبت سفارش" });
       }
     } catch (err) {
       this.setState({ errMassage: "خطا در ثبت سفارش" });
@@ -277,13 +287,32 @@ export default class Cart extends Component<any, any> {
         {this.state.cartItems.length === 0 && (
           <div className={styles.emptyCartMessage}>سبد خرید شما خالی است.</div>
         )}
-        
+
         {this.state.showSuccessPopup && (
           <div className={styles.orderPopupOverlay}>
             <div className={styles.orderPopupBox}>
-              <h3>ثبت سفارش موفق</h3>
-              <p>مشتری عزیز، جناب {this.state.fullName}</p>
-              <p>سفارش شما با شماره {this.state.testSmsOrderNumber} ثبت شد.</p>
+              <h3 className={styles.orderPopupHeading}>ثبت سفارش موفق</h3>
+
+              <p className={styles.orderPopupParaph}>
+                مشتری عزیز، {this.state.fullName}
+              </p>
+
+              <p className={styles.orderPopupParaph}>
+                سفارش شما با شماره{" "}
+                <span className={styles.popupHeading}>
+                  {this.state.testSmsOrderNumber}
+                </span>{" "}
+                ثبت شد.
+              </p>
+
+              <p className={styles.orderPopupParaph}>
+                همکاران ما پس از بررسی در اسرع وقت
+              </p>
+
+              <p className={styles.orderPopupParaph}>
+                با شما تماس خواهند گرفت.
+              </p>
+
               <button
                 onClick={() => {
                   localStorage.removeItem("userGuid");
