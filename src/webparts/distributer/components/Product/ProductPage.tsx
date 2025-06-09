@@ -44,7 +44,7 @@ export default class ProductPage extends React.Component<any, any> {
 
     try {
       const currentUser = await getCurrentUser();
-      const nameId = currentUser.UserId.NameId;
+      const nameId = currentUser.UserId.NameId.toUpperCase();
       const availableInventory = await getInventoryByCode(Code);
       const item = await loadItemByCode(Code);
       const imageUrl: Image[] = await loadImages();

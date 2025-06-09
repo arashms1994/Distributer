@@ -47,7 +47,7 @@ export default class ProductCard extends React.Component<
 
       const updatedInventory = Number(actualInventory - totalReserveInventory);
 
-      const priceColumn = nameId;
+      const priceColumn = nameId.toUpperCase();
       const distributerPrice = ItemStore[priceColumn];
 
       this.setState({
