@@ -14,7 +14,7 @@ export default class ProductsDiv extends React.Component<
       <div className={styles.productsDiv}>
         {products.map((p, i) => {
           const distributerPrice = p[userName];
-          console.log(distributerPrice)
+
           const matchedImage = image.find(
             (img) => img.name === `${p.IdCode}.jpg`
           );

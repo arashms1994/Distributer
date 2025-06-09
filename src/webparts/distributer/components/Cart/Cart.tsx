@@ -102,7 +102,6 @@ export default class Cart extends Component<any, any> {
       const currentUser = await getCurrentUser();
       const nameId = currentUser.UserId.NameId;
       const customerInfo = await getCustomerInfoByUserName(nameId);
-      console.log(customerInfo);
 
       const fullName = customerInfo.Title || "";
       const customerCode = customerInfo.CustomerCode || "";
