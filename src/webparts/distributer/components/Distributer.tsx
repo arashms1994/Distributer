@@ -1,7 +1,12 @@
 import * as React from "react";
 import { Component } from "react";
 import { IDistributerProps, Product } from "../components/IDistributerProps";
-import { getCurrentUser, loadImages, loadItems } from "./Crud/GetData";
+import {
+  getCurrentUser,
+  getCustomerInfoByUserName,
+  loadImages,
+  loadItems,
+} from "./Crud/GetData";
 import styles from "./Styles/Distributer.module.scss";
 import ProductsDiv from "./Product/ProductsDiv";
 import FilterBar from "./Filter/FilterBar";
@@ -43,8 +48,9 @@ export default class Distributer extends Component<IDistributerProps, any> {
     const items = await loadItems();
     const imageUrl = await loadImages();
     const currentUser = await getCurrentUser();
-    const nameId = currentUser.UserId.NameId.toUpperCase();
-    console.log(nameId)
+    const nameId = currentUser.UserId.NameId;
+    const user = await getCustomerInfoByUserName(nameId);
+    const userName = user.UserName;
 
     let userGuid = localStorage.getItem("userGuid");
     if (!userGuid) {
@@ -52,7 +58,7 @@ export default class Distributer extends Component<IDistributerProps, any> {
       localStorage.setItem("userGuid", userGuid);
     }
 
-    this.setState({ userGuid, items, imageUrl, nameId });
+    this.setState({ userGuid, items, imageUrl, userName });
   }
 
   handleSearch(event) {
@@ -203,7 +209,7 @@ export default class Distributer extends Component<IDistributerProps, any> {
             products={filteredItems}
             cart={this.handleAddToCart}
             updateCartCount={this.props.updateCartCount}
-            nameId={this.state.nameId}
+            userName={this.state.userName}
           />
         </div>
       </div>
