@@ -247,8 +247,8 @@ export default class Cart extends Component<any, any> {
           String(this.state.expertAcc),
           String(this.state.expertName)
         );
-
-        const smsMessage = `جناب ${this.state.fullName} سفارش شما با شماره ${testSmsOrderNumber} ثبت شد`;
+        
+        const smsMessage = `${this.state.fullName} عزیز، سفارش شما با شماره ${testSmsOrderNumber} ثبت شد،  همکاران ما در اسرع وقت با شما تماس خواهند گرفت.`;
         const CSEsmsMessage = `سفارش جناب ${this.state.fullName} با شماره ${testSmsOrderNumber} ثبت شد `;
 
         sendSmsToZarsimCEO(CSEsmsMessage, "09123146451");
