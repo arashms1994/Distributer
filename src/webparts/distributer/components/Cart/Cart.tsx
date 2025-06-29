@@ -328,7 +328,7 @@ export default class Cart extends Component<any, any> {
         {this.state.showSuccessPopup && (
           <div className={styles.orderPopupOverlay}>
             <div className={styles.orderPopupBox}>
-              <h3 className={styles.orderPopupHeading}>ثبت سفارش موفق</h3>
+              <h3 className={styles.orderPopupHeading}>ثبت سفارش موفق ✅</h3>
 
               <p className={styles.orderPopupParaph}>
                 مشتری عزیز، {this.state.fullName}
